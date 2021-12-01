@@ -83,8 +83,6 @@ public class CitaController {
 		} 
 	}
 
-
-
 	@GetMapping("/getTodos")
 	/***
 	 * Obtenemos la lista de las citas
@@ -98,7 +96,6 @@ public class CitaController {
 			throw new CitasNoEncontradasException();
 		}
 	}
- 
 
 	@GetMapping("/getCentroSanitario/{email}")
 	/***
@@ -144,7 +141,6 @@ public class CitaController {
 		return null;
 	}
 
-
 	@Transactional
 	@PutMapping("/eliminarCita/{id}")
 	/***
@@ -182,8 +178,6 @@ public class CitaController {
 		return repositoryCita.save(cita);
 	}
 
- 
-
 	@GetMapping("/getCitaPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
@@ -199,7 +193,6 @@ public class CitaController {
 		return null;
 	}
 
-
 	@GetMapping("/")
 	/***
 	 * Obtenemos todas las citas
@@ -208,7 +201,6 @@ public class CitaController {
 	public List<Cita> readAll() {
 		return repositoryCita.findAll();
 	}
-
 
 	@SuppressWarnings("deprecation")
 	@Transactional
@@ -379,9 +371,6 @@ public class CitaController {
 
 		return c;
 	}
-
-
-	
 	
 	@SuppressWarnings("deprecation")
 	/***
