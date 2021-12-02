@@ -7,7 +7,7 @@ package com.vacuna.vacuna.model;
 
 public class PersonalDeCitas extends Usuario {
 	/***
-	 * Constructor del administrador
+	 * Constructor del personal de citas
 	 * @param nombre
 	 * @param email
 	 * @param password

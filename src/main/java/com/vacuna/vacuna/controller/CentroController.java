@@ -199,8 +199,6 @@ public class CentroController {
 		return repository.save(centro);
 	}
 
-	
-	
 	@Transactional
 	@DeleteMapping("/eliminarCentro/{id}") 
 	/***

@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Usuarios</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="css/w3.css">
@@ -8,13 +11,13 @@
 <body>
 
     <!-- Sidebar/menu -->
-    <nav class="w3-sidebar w3-indigo w3-collapse w3-top w3-large w3-padding"
+   <nav class="w3-sidebar w3-indigo w3-collapse w3-top w3-large w3-padding"
         style="z-index:3;width:300px;font-weight:bold;" id="mySidebar">
         <header class="avatar">
             <img src="img/men.jpg" />
-             <h2 class="usuarioiniciado" data-bind= "html : nombreUsuario"></h2>
+            <h2 class="usuarioiniciado" data-bind= "html : nombreUsuario"></h2>
             <h4 class="usuarioiniciado" data-bind= "html : tipoUsuario"></h4>
-            <div class= "cerrarSesion">
+			<div class= "cerrarSesion">
 	            	<button data-bind="click : logout" chroming="callToAction" style= "background-color: #6666ff; border-radius: 5px; color: white;  font-size: 18px; margin-top:8px;">Cerrar Sesion</button>   
             </div> 
         </header>
@@ -25,24 +28,15 @@
         </div>
         <div class="w3-bar-block">
             <!-- Usuarios -->
-            <button class="dropdown-btn w3-bar-item w3-button w3-hover-white">Usuarios
-                <i class="fa fa-caret-down"></i>
+            <button class="dropdown-btn w3-bar-item w3-button w3-hover-white">Gestión de citas
+                <em class="fa fa-caret-down"></em>
             </button>
             <div class="dropdown-container">
-                <a data-bind="click : crearUsuarios" class="w3-bar-item w3-button w3-hover-white">Crear Usuarios</a>
-                <a data-bind="click : gestionUsuarios" class="w3-bar-item w3-button w3-hover-white">Ver usuarios</a>
+                <a data-bind="click : irHomePersonalDeCitas" class="w3-bar-item w3-button w3-hover-white">Ver usuarios</a>
             </div>
-            <!-- Centros -->
-            <button class="dropdown-btn w3-bar-item w3-button w3-hover-white">Centros
-                <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-container">
-                <a data-bind="click : crearCentros" class="w3-bar-item w3-button w3-hover-white">Crear Centro</a>
-                <a data-bind="click : gestionCentros" class="w3-bar-item w3-button w3-hover-white">Ver centros</a>
-            </div>
-            
         </div>        
     </nav>
+
     <!-- Top menu on small screens -->
     <header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
         <a href="javascript:void(0)" class="w3-button w3-red w3-margin-right" onclick="w3_open()">☰</a>
@@ -56,55 +50,37 @@
     <!-- !PAGE CONTENT! -->
     <div class="w3-main" style="margin-left:340px;margin-right:40px">
 
-        <!-- Header -->
+        
         <div class="w3-container" style="margin-top:80px" id="showcase">
-            <h1 class="w3-jumbo"><b>Crear usuario</b></h1>
+            <h1 class="w3-jumbo"><b>Usuarios</b></h1>
+        
+           <div class="scroll">
+            <table class="w3-table-all w3-centered">
+                <tr class="w3-indigo">
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>DNI</th>
+                    <th>Centro Asignado</th>
+                    <th>Dosis Administradas</th>
+                    <th>Asignar</th>
+                    <th>Modificar</th>
+                    <th>Anular</th>
+                </tr>
+                <!-- ko foreach : usuarios -->
+                <tr>
+                    <td data-bind="html : nombre"></td>
+                    <td data-bind="html : email"></td>
+                    <td data-bind="html : dni"></td>
+                    <td data-bind="html : centroAsignado"></td>
+                    <td data-bind="html : dosisAdministradas"></td>                     
+                    <td><img data-bind=""  class="iconoImg" src="css/mas.png" style="width:20%"></td>
+                    <td><img data-bind=""  class="iconoImg" src="css/modify.png" style="width:20%"></td>
+                    <td><img data-bind="click : function() { $parent.eliminarUsuario(email); }"  class="iconoImg" src="css/delete.png" style="width:20%"></td>
+                </tr>
+                <!-- /ko -->
+            </table>
+            </div>
 
-            <form action="">
-                <label>Nombre</label>
-                <input type="text" data-bind="value : nombre" placeholder="Nombre">
-
-                <label>Email</label>
-                <input type="text" data-bind="value : email" placeholder="Email">
-
-                <label>Password</label>
-                <input data-bind="value : password" type="password" placeholder="Password">
-                
-                <label>Repite Contraseña</label>
-                <input data-bind="value : password2" type="password" placeholder="Password">
-
-                <label>DNI</label>
-                <input type="text" data-bind="value : dni" name="dni" placeholder="DNI">
-
-                <br>
-                <br>
-
-                <label>Tipo de usuario: </label>
-                <input id="tipoUsario" name="tipoUsuario" type="radio" value="Administrador" />Administrador
-                <input id="tipoUsuario" name="tipoUsuario" type="radio" value="Sanitario" />Sanitario
-                <input id="tipoUsuario" name="tipoUsuario" type="radio" value="Paciente" />Paciente
-                <input id="tipoUsuario" name="tipoUsuario" type="radio" value="Personal de Citas" />Personal de Citas
-
-                <br>
-                <br>
-
-
-                <label>Centro asignado</label>
-                <select id="menuCentros">
-                    <!--  ko foreach : centroAsignado -->
-                    <option data-bind="html : nombre"></option>
-                    <!-- /ko -->
-                </select>
-
-                <label>Localidad</label>
-                <input type="text" data-bind="value : localidad" placeholder="Localidad">
-
-                <label>Provincia</label>
-                <input type="text" data-bind="value : provincia" placeholder="Provincia">
-                <oj-button chroming="callToAction" class="oj-button-sm" data-bind="click : add" style="margin-top:3px;">
-                    Guardar
-                    Usuario</oj-button>
-            </form>
         </div>
         <!-- End page content -->
     </div>

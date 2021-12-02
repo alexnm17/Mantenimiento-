@@ -38,6 +38,7 @@ import com.vacuna.vacuna.model.Administrador;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
 import com.vacuna.vacuna.model.Paciente;
+import com.vacuna.vacuna.model.PersonalDeCitas;
 import com.vacuna.vacuna.model.Sanitario;
 import com.vacuna.vacuna.model.Usuario;
 
@@ -99,7 +100,7 @@ public class UsuarioController {
 
 		byte[] pwd = md.digest(password.getBytes());
 		
-		Usuario u = new Usuario(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
+		Usuario u;
 		
 		if(!formValido(nombre, email, dni, centroAsignado, tipoUsuario, password)) {
 			throw new DatosIncompletosException();
@@ -125,6 +126,9 @@ public class UsuarioController {
 			break;
 		case "Sanitario":
 			u = new Sanitario(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
+			break;
+		case "Personal de Citas":
+			u = new PersonalDeCitas(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
 			break;
 		default:
 			throw new UsuarioNoExisteException();
