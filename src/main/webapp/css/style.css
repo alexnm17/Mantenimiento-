@@ -115,7 +115,7 @@ h2 {
   pointer-events: none; }
 
 .contenedor {
-  width:1000px;
+  width:80%;
   max-width:1000px;
   margin:0 auto;
   overflow:hidden;}
