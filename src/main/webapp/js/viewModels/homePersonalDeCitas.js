@@ -20,8 +20,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 				self.nombreUsuario = ko.observable("");
 
-
-
 				// Header Config
 				self.headerConfig = ko.observable({
 					'view': [],
@@ -48,6 +46,11 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 			irHomePersonalDeCitas() {
 				app.router.go({ path: "homePersonalDeCitas" });
+			}
+			
+			administrarCitas(dni) {
+				localStorage.setItem('dniUsuarioAAdministrar', dni)
+				app.router.go({ path: "administrarCitas" });
 			}
 
 			paginaInicio() {
