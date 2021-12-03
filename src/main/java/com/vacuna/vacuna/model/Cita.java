@@ -11,8 +11,8 @@ public class Cita {
 
 	@Id 
 	private String id ;
-	private long fechaPrimeraDosis;
-	private long fechaSegundaDosis;
+	private String fechaPrimeraDosis;
+	private String fechaSegundaDosis;
 	private String nombreCentro;
 	private String dniPaciente;
 	private String nombrePaciente;
@@ -24,7 +24,7 @@ public class Cita {
 	 * @param dniPaciente
 	 * @param nombrePaciente
 	 */
-	public Cita(long fechaPrimeraDosis, long fechaSegundaDosis, String nombreCentro, String dniPaciente,String nombrePaciente) {
+	public Cita(String fechaPrimeraDosis, String fechaSegundaDosis, String nombreCentro, String dniPaciente,String nombrePaciente) {
 		super();
 		this.fechaPrimeraDosis = fechaPrimeraDosis;
 		this.fechaSegundaDosis = fechaSegundaDosis;
@@ -98,7 +98,7 @@ public class Cita {
 	 * getFechaPrimeraDosis
 	 * @return fechaPrimeraDosis
 	 */
-	public long getFechaPrimeraDosis() {
+	public String getFechaPrimeraDosis() {
 		return fechaPrimeraDosis;
 	}
 	
@@ -106,7 +106,7 @@ public class Cita {
 	 * setFechaPrimeraDosis
 	 * @param fechaPrimeraDosis
 	 */
-	public void setFechaPrimeraDosis(long fechaPrimeraDosis) {
+	public void setFechaPrimeraDosis(String fechaPrimeraDosis) {
 		this.fechaPrimeraDosis = fechaPrimeraDosis;
 	}
 	
@@ -114,7 +114,7 @@ public class Cita {
 	 * getFechaSegundaDosis
 	 * @return fechaSegundaDosis
 	 */
-	public long getFechaSegundaDosis() {
+	public String getFechaSegundaDosis() {
 		return fechaSegundaDosis;
 	}
 	
@@ -122,7 +122,7 @@ public class Cita {
 	 * setFechaSegundaDosis
 	 * @param fechaSegundaDosis
 	 */
-	public void setFechaSegundaDosis(long fechaSegundaDosis) {
+	public void setFechaSegundaDosis(String fechaSegundaDosis) {
 		this.fechaSegundaDosis = fechaSegundaDosis;
 	}
 
