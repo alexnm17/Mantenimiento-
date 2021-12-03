@@ -114,6 +114,11 @@ h2 {
   opacity: 0.9;
   pointer-events: none; }
 
+.contenedor {
+  width:1000px;
+  max-width:1000px;
+  margin:0 auto;
+  overflow:hidden;}
 .control__indicator:after {
   font-family: 'icomoon';
   content: '\e5ca';
