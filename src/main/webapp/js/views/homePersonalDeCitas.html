@@ -62,9 +62,7 @@
                     <th>DNI</th>
                     <th>Centro Asignado</th>
                     <th>Dosis Administradas</th>
-                    <th>Asignar</th>
-                    <th>Modificar</th>
-                    <th>Anular</th>
+                    <th>Administrar citas</th>
                 </tr>
                 <!-- ko foreach : usuarios -->
                 <tr>
@@ -73,9 +71,7 @@
                     <td data-bind="html : dni"></td>
                     <td data-bind="html : centroAsignado"></td>
                     <td data-bind="html : dosisAdministradas"></td>                     
-                    <td><img data-bind=""  class="iconoImg" src="css/mas.png" style="width:20%"></td>
-                    <td><img data-bind=""  class="iconoImg" src="css/modify.png" style="width:20%"></td>
-                    <td><img data-bind="click : function() { $parent.eliminarUsuario(email); }"  class="iconoImg" src="css/delete.png" style="width:20%"></td>
+                    <td><img data-bind="click : function() { $parent.administrarCitas(dni); }"  class="iconoImg" src="css/engranaje.png" style="width:20%" alt="administrar citas"></td>
                 </tr>
                 <!-- /ko -->
             </table>

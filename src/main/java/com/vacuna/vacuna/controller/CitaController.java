@@ -194,6 +194,16 @@ public class CitaController {
 		}
 		return null;
 	}
+	
+	@GetMapping("/getCitasPaciente/{dni}")
+	/***
+	 * Obtenemos la cita de un paciente
+	 * @param dni
+	 * @return lista de citas
+	 */
+	public List<Cita> getCitasPaciente(@PathVariable String dni){
+		return repositoryCita.findAllByDniPaciente(dni);
+	}
 
 	@GetMapping("/")
 	/***
