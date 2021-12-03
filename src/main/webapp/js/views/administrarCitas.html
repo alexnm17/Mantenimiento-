@@ -50,28 +50,30 @@
 		<!-- Header -->
 		<div class="w3-container" style="margin-top:80px" id="showcase">
 			<h1 class="w3-jumbo"><b>Citas</b></h1>
-			<button class="button">Solicitar cita</button>
+			<button class="button">Asignar cita</button>
 			<table class="w3-table-all w3-centered">
 				<tr class="w3-indigo">
 					<th>Paciente</th>
 					<th>DNI</th>
 					<th>Centro Asignado</th>
 					<th>Fecha Primera Dosis</th>
+					<th>Acciones Primera Dosis</th>
+					<th></th>
 					<th>Fecha Segunda Dosis</th>
-					<th>Eliminar</th>
-					<th>Modificar</th>
+					<th>Acciones Segunda Dosis</th>
+					<th></th>
 				</tr>
 				<!-- ko foreach : citas -->
 				<tr>
-					<td data-bind="html : nombreUsuario"></td>
+					<td data-bind="html : nombrePaciente"></td>
 					<td data-bind="html : dniPaciente"></td>
-					<td data-bind="html : centroAsignado"></td>
+					<td data-bind="html : nombreCentro"></td>
 					<td data-bind="html : fechaPrimeraDosis"></td>
+                    <td><img class="iconoImg" src="css/modify.png" style="width:20%"></td>
+                    <td><img class="iconoImg" src="css/delete.png" style="width:20%"></td>
 					<td data-bind="html : fechaSegundaDosis"></td>
-					<td><img data-bind="click : function() { $parent.eliminarCita(id); }" class="iconoImg"
-							src="css/delete.png" style="width:20%"></td>
-					<td><img data-bind="click : function() { $parent.modificarCita(id); }" class="iconoImg"
-							src="css/modify.png" style="width:20%"></td>
+                    <td><img class="iconoImg" src="css/modify.png" style="width:20%"></td>
+                    <td><img class="iconoImg" src="css/delete.png" style="width:20%"></td>
 				</tr>
 				<!-- /ko -->
 			</table>
