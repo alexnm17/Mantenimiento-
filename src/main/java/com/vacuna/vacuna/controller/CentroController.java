@@ -65,8 +65,8 @@ public class CentroController {
 		int hFin = 0;
 		List<CentroSanitario> listCentro = repository.findAll();
 		if(listCentro.isEmpty()) { 
-			 hInicio = listCentro.get(0).getHoraInicio();
-			 hFin = listCentro.get(0).getHoraFin();
+			 //hInicio = listCentro.get(0).getHoraInicio();
+			 //hFin = listCentro.get(0).getHoraFin();
 			 aforo = listCentro.get(0).getAforo();
 		}else {
 			 String af = jso.optString("aforo");
@@ -85,7 +85,7 @@ public class CentroController {
 				 throw new ControlHorasVacunacionException();
 			 }
 		}
-		CentroSanitario c = new CentroSanitario(nombre, dosisTotales, aforo,hInicio,hFin, localidad, provincia);
+		CentroSanitario c = new CentroSanitario(nombre, dosisTotales, aforo, localidad, provincia);
 		  
 		return repository.insert(c);
 
@@ -183,15 +183,15 @@ public class CentroController {
 		for(int i=0;i<listCentro.size();i++) {
 			CentroSanitario cs = listCentro.get(i);
 			listCentro.get(i).setAforo(aforo);
-			listCentro.get(i).setHoraInicio(hInicio);
-			listCentro.get(i).setHoraFin(hFin);
+			//listCentro.get(i).setHoraInicio(hInicio);
+			//listCentro.get(i).setHoraFin(hFin);
 			repository.save(cs);
 		}
 
 		centro.setNombre(nombre);
 		centro.setAforo(aforo);
-		centro.setHoraInicio(hInicio);
-		centro.setHoraFin(hFin);
+		//centro.setHoraInicio(hInicio);
+		//centro.setHoraFin(hFin);
 		centro.setLocalidad(localidad);
 		centro.setProvincia(provincia);
 		centro.setDosisTotales(dosisTotales);
