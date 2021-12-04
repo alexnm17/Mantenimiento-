@@ -50,6 +50,11 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}else if(response.tipoUsuario=="Sanitario"){
 						app.navDataMenu.push({ path: 'home', detail : { label : 'Home'} });  
 						app.router.go( { path : "homeSanitario"} );	
+					
+					}else if(response.tipoUsuario=="Personal de Citas"){
+						app.navDataMenu.push({ path: 'home', detail : { label : 'Home'} });  
+						app.router.go( { path : "homePersonalDeCitas"} );	
+						
 					}else{
 						app.navDataMenu.push({ path: 'home', detail : { label : 'Home'} });  
 						app.router.go( { path : "homeAdmin"} );	
