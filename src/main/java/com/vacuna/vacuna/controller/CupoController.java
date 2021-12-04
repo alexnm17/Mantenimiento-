@@ -10,24 +10,48 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.vacuna.vacuna.dao.UsuarioDAO;
 
-	
 
+
+
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vacuna.vacuna.dao.CentroSanitarioDAO;
+import com.vacuna.vacuna.dao.CupoDAO;
+import com.vacuna.vacuna.dao.PacienteDAO;
+import com.vacuna.vacuna.model.CentroSanitario;
+import com.vacuna.vacuna.model.Cupo;
+import com.vacuna.vacuna.model.Paciente;
+import com.vacuna.vacuna.model.Usuario;
+
+
+@RestController
 public class CupoController {
-	
+
+	@Autowired
+	private CupoDAO cupoDao;
+	@Autowired
+	private PacienteDAO pacienteDao;
 	@Autowired
 	private UsuarioDAO repositoryUsuario;
-	/*
+	@Autowired
+	private CentroSanitarioDAO repositoryCentro;
+
+
+
 	@GetMapping("/getAllCuposDisponiblesPorFecha")
 	public List<Cupo> getAllCuposConHuecoPorFecha(HttpSession session, @RequestParam String fecha) {
-		Optional<Usuario> optUsuario = repositoryUsuario.findByEmail((String)session.getAttribute("email"));
+		
+		Optional<Paciente> optUsuario = pacienteDao.findById((String)session.getAttribute("email"));
 		CentroSanitario centroSanitario = new CentroSanitario();
 		if (optUsuario.isPresent())
-			centroSanitario = optUsuario.get().getCentroSanitario();
+			centroSanitario = repositoryCentro.findByNombre(optUsuario.get().getCentroAsignado());
 
-		List<Cupo> listaCupos = cupoDao.findAllByCentroSanitarioAndFecha(centroVacunacion, fecha);
+		List<Cupo> listaCupos = cupoDao.findAllByCentroSanitarioAndFecha(centroSanitario, fecha);
 		List<Cupo> listaCuposLibres = new ArrayList<>();
 
 		listaCupos.sort(Comparator.comparing(Cupo::getFecha));
@@ -39,7 +63,8 @@ public class CupoController {
 				listaCuposLibres.add(cupo);
 			}
 		}
-
 		return listaCuposLibres;
-	}*/
-}
+	}
+
+
+	}

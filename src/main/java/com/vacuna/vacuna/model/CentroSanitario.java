@@ -14,8 +14,8 @@ public class CentroSanitario {
 		private String nombre;
 		private int dosisTotales;
 		private int aforo;
-		private int horaInicio;
-		private int horaFin;
+		//private int horaInicio;
+		//private int horaFin;
 		private String localidad;
 		private String provincia;
 		
@@ -29,14 +29,12 @@ public class CentroSanitario {
 		 * @param localidad
 		 * @param provincia
 		 */
-		public CentroSanitario(String nombre, int dosisTotales, int aforo,int horaInicio,int horaFin, String localidad,
+		public CentroSanitario(String nombre, int dosisTotales, int aforo, String localidad,
 				String provincia) {
 			super();
 			this.nombre = nombre;
 			this.dosisTotales = dosisTotales; //Valor constante de momento
 			this.aforo = aforo; //Valor constante de momento
-			this.horaInicio = horaInicio;
-			this.horaFin = horaFin;
 			this.localidad = localidad;
 			this.provincia = provincia;
 		}
@@ -46,34 +44,7 @@ public class CentroSanitario {
 		 * getHoraInicio
 		 * @return horaInicio
 		 */
-		public int getHoraInicio() {
-			return horaInicio;
-		}
-		
-		/***
-		 * setHoraInicio
-		 * @param horaInicio
-		 */
-		public void setHoraInicio(int horaInicio) {
-			this.horaInicio = horaInicio;
-		}
-
-		/***
-		 * getHoraFin
-		 * @return horaFin
-		 */
-		public int getHoraFin() {
-			return horaFin;
-		}
-		
-		/***
-		 * setHoraFin
-		 * @param horaFin
-		 */
-		public void setHoraFin(int horaFin) {
-			this.horaFin = horaFin;
-		}
-
+				
 
 		public void restarDosis() {
 			dosisTotales -= 2;
