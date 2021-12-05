@@ -37,8 +37,6 @@ public class CupoController {
 	@Autowired
 	private PacienteDAO pacienteDao;
 	@Autowired
-	private UsuarioDAO repositoryUsuario;
-	@Autowired
 	private CentroSanitarioDAO repositoryCentro;
 
 
