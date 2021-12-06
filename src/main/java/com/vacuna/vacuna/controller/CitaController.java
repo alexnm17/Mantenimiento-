@@ -31,6 +31,7 @@ import com.vacuna.vacuna.dao.CitaDAO;
 import com.vacuna.vacuna.dao.UsuarioDAO;
 import com.vacuna.vacuna.exception.CentrosNoEncontradosException;
 import com.vacuna.vacuna.exception.CitasNoEncontradasException;
+import com.vacuna.vacuna.exception.ControlHorasVacunacionException;
 import com.vacuna.vacuna.exception.DiasEntreDosisIncorrectosException;
 import com.vacuna.vacuna.exception.ErrorDosisAdministradasException;
 import com.vacuna.vacuna.exception.NoHayDosisException;
@@ -39,6 +40,7 @@ import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
 import com.vacuna.vacuna.model.Paciente;
 import com.vacuna.vacuna.model.Usuario;
+import com.vacuna.vacuna.model.FormatoVacunacion;
 
 @RestController
 /***
@@ -55,7 +57,9 @@ public class CitaController {
 	@Autowired
 	private CitaDAO repositoryCita;
 
-
+	@Autowired
+	private FormatoVacunacionDao repositoryFormatoVacunacion;
+	
 	@Autowired
 	private CentroSanitarioDAO repositoryCentro;
 
@@ -284,6 +288,37 @@ public class CitaController {
 		return repositoryCita.save(cita);
 	}
 
+	@Transactional
+	@PutMapping("/definirFormatoVacunacion")
+	/***
+	 * Modificamos una cita
+	 * @param session
+	 * @param info
+	 * @return Formato de vacunacion creado
+	 * @throws ParseException
+	 * @throws DiasEntreDosisIncorrectosException
+	 * @throws NoHayDosisException
+	 * @throws SlotVacunacionSuperadoException
+	 */
+	public void definirFormatoVacunacion(HttpSession session, @RequestBody Map<String, Object> datosFormatoVacunacion) {
+
+			JSONObject jso = new JSONObject(datosFormatoVacunacion);
+			String horaInicio = jso.getString("horaInicio");
+			String horaFin = jso.getString("horaFin");
+			int duracionFranja = jso.getInt("duracionFranja");
+			int personasAVacunar = jso.getInt("personasAVacunar");
+
+			FormatoVacunacion formatoVacunacion = new FormatoVacunacion(horaInicio, horaFin, duracionFranja,
+					personasAVacunar);
+			if (formatoVacunacion.horasCorrectas()) {
+				repositoryFormatoVacunacion.insert(formatoVacunacion);
+			} else {
+				throw new ControlHorasVacunacionException();
+			}
+
+	}
+	
+	
 	private CentroSanitario obtenerCentro(String nombreCentro) {
 		List<CentroSanitario> listaCentros = repositoryCentro.findAll();
 		for (int i = 0; i < listaCentros.size(); i++) {
