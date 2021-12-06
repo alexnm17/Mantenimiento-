@@ -18,7 +18,10 @@ public class Usuario {
 	protected String dni;
 	protected String tipoUsuario;
 	protected String centroAsignado;
+	protected String estadoVacunacion;
 	
+
+
 	/***
 	 * Constructor usuario
 	 * @param nombre
@@ -108,5 +111,13 @@ public class Usuario {
 	 */ 
 	public String getTipoUsuario() {
 		return tipoUsuario;
+	}
+	
+	public String getEstadoVacunacion() {
+		return estadoVacunacion;
+	}
+
+	public void setEstadoVacunacion(String estadoVacunacion) {
+		this.estadoVacunacion = estadoVacunacion;
 	}
 }

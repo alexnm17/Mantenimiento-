@@ -1,11 +1,12 @@
 
 package com.vacuna.vacuna.controller;
 
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,18 +30,27 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.vacuna.vacuna.dao.CentroSanitarioDAO;
 import com.vacuna.vacuna.dao.CitaDAO;
+import com.vacuna.vacuna.dao.CupoDAO;
+import com.vacuna.vacuna.dao.FormatoVacunacionDAO;
+import com.vacuna.vacuna.dao.PacienteDAO;
 import com.vacuna.vacuna.dao.UsuarioDAO;
 import com.vacuna.vacuna.exception.CentrosNoEncontradosException;
 import com.vacuna.vacuna.exception.CitasNoEncontradasException;
 import com.vacuna.vacuna.exception.ControlHorasVacunacionException;
+import com.vacuna.vacuna.exception.CupoNoEncontradoException;
 import com.vacuna.vacuna.exception.DiasEntreDosisIncorrectosException;
 import com.vacuna.vacuna.exception.ErrorDosisAdministradasException;
 import com.vacuna.vacuna.exception.NoHayDosisException;
 import com.vacuna.vacuna.exception.SlotVacunacionSuperadoException;
+import com.vacuna.vacuna.exception.UsuarioNoExisteException;
+import com.vacuna.vacuna.exception.VacunaException;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
 import com.vacuna.vacuna.model.Paciente;
 import com.vacuna.vacuna.model.Usuario;
+
+import com.vacuna.vacuna.model.Cupo;
+
 import com.vacuna.vacuna.model.FormatoVacunacion;
 
 @RestController
@@ -53,46 +64,28 @@ public class CitaController {
 
 	CentroSanitario centroSanitario;
 
-
 	@Autowired
 	private CitaDAO repositoryCita;
 
 	@Autowired
-	private FormatoVacunacionDao repositoryFormatoVacunacion;
-	
+	private FormatoVacunacionDAO repositoryFormatoVacunacion;
+
 	@Autowired
 	private CentroSanitarioDAO repositoryCentro;
-
 
 	@Autowired
 	private UsuarioDAO repositoryUsuario;
 
-
-	@PutMapping("/add")
-	/***
-	 * Añadimos una cita
-	 * @param info
-	 * @returncita creada
-	 * @throws ErrorDosisAdministradasException
-	 * @throws SlotVacunacionSuperadoException
-	 * @throws NoHayDosisException
-	 */
-	public Cita add(@RequestBody Map<String, Object> info) throws ErrorDosisAdministradasException, SlotVacunacionSuperadoException, NoHayDosisException  {
-		JSONObject jso = new JSONObject(info);
-		String dniUsuario = jso.optString("dni"); 
-
-		Usuario usuario = repositoryUsuario.findByDni(dniUsuario);
-		String nombre = usuario.getNombre();
-		if ((Integer.parseInt(((Paciente) usuario).getDosisAdministradas()) < 2)) {
-			return crearCita(usuario.getCentroAsignado(), dniUsuario,nombre);
-		} else {
-			throw new ErrorDosisAdministradasException();
-		} 
-	}
+	@Autowired
+	private CupoDAO repositoryCupo;
+	
+	@Autowired
+	private PacienteDAO repositoryPaciente;
 
 	@GetMapping("/getTodos")
 	/***
 	 * Obtenemos la lista de las citas
+	 * 
 	 * @return repositorio de citas
 	 * @throws CitasNoEncontradasException
 	 */
@@ -107,6 +100,7 @@ public class CitaController {
 	@GetMapping("/getCentroSanitario/{email}")
 	/***
 	 * Obtenemos la lista de los centros
+	 * 
 	 * @param email
 	 * @return repositorio de centros
 	 * @throws CentrosNoEncontradosException
@@ -119,20 +113,21 @@ public class CitaController {
 			return repositoryCita.findAllByNombreCentro(cs.getNombre());
 		} catch (Exception e) {
 			throw new CentrosNoEncontradosException();
-		} 
+		}
 	}
 
 	@Transactional
 	@DeleteMapping("/eliminarCitaCompleta/{id}")
 	/***
 	 * Eliminamos las dos citas, la de la primera dosis y la de la segunda
+	 * 
 	 * @param id
 	 * @return null
 	 */
-	public Cita eliminarCitaCompleta(@PathVariable String id){
+	public Cita eliminar1CitaCompleta(@PathVariable String id) {
 		Optional<Cita> c = repositoryCita.findById(id);
-		
-		if (c.isPresent()) {  
+
+		if (c.isPresent()) {
 			Cita citaAux = new Cita();
 			citaAux = c.get();
 			Paciente p = (Paciente) repositoryUsuario.findByDni(c.get().getDniPaciente());
@@ -144,7 +139,7 @@ public class CitaController {
 			repositoryCentro.save(cs);
 			repositoryCita.deleteById(id);
 		}
-		
+
 		return null;
 	}
 
@@ -152,12 +147,13 @@ public class CitaController {
 	@PutMapping("/eliminarCita/{id}")
 	/***
 	 * Eliminamos solo una cita
+	 * 
 	 * @param id
 	 * @param info
 	 * @return cita eliminada
 	 * @throws ParseException
 	 */
-	public Cita eliminarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException{
+	public Cita eliminarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException {
 
 		Optional<Cita> c = repositoryCita.findById(id);
 		Cita cita = new Cita();
@@ -165,7 +161,6 @@ public class CitaController {
 		if (c.isPresent()) {
 			cita = c.get();
 		}
-
 
 		JSONObject jso = new JSONObject(info);
 		String nombreCentro = jso.optString("centrosSanitarios");
@@ -178,10 +173,11 @@ public class CitaController {
 		DateFormat fechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		Date citaMod = fechaHora.parse(fechaPrimeraMod);
 
-		/*cita.setFechaPrimeraDosis(citaMod.getTime());
-
-		cita.setFechaSegundaDosis(0);
-		*/
+		/*
+		 * cita.setFechaPrimeraDosis(citaMod.getTime());
+		 * 
+		 * cita.setFechaSegundaDosis(0);
+		 */
 
 		return repositoryCita.save(cita);
 	}
@@ -189,6 +185,7 @@ public class CitaController {
 	@GetMapping("/getCitaPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
+	 * 
 	 * @param dni
 	 * @return null
 	 */
@@ -200,20 +197,22 @@ public class CitaController {
 		}
 		return null;
 	}
-	
+
 	@GetMapping("/getCitasPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
+	 * 
 	 * @param dni
 	 * @return lista de citas
 	 */
-	public List<Cita> getCitasPaciente(@PathVariable String dni){
+	public List<Cita> getCitasPaciente(@PathVariable String dni) {
 		return repositoryCita.findAllByDniPaciente(dni);
 	}
 
 	@GetMapping("/")
 	/***
 	 * Obtenemos todas las citas
+	 * 
 	 * @return repositorio de citas
 	 */
 	public List<Cita> readAll() {
@@ -225,6 +224,7 @@ public class CitaController {
 	@PutMapping("/modificarCita/{id}")
 	/***
 	 * Modificamos una cita
+	 * 
 	 * @param id
 	 * @param info
 	 * @return cita modificada
@@ -233,13 +233,14 @@ public class CitaController {
 	 * @throws NoHayDosisException
 	 * @throws SlotVacunacionSuperadoException
 	 */
-	public Cita modificarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException, DiasEntreDosisIncorrectosException, NoHayDosisException, SlotVacunacionSuperadoException {
+	public Cita modificarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException,
+			DiasEntreDosisIncorrectosException, NoHayDosisException, SlotVacunacionSuperadoException {
 		Optional<Cita> c = repositoryCita.findById(id);
-		
+
 		if (!c.isPresent()) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT,"No exite dicha cita");
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "No exite dicha cita");
 		}
-		Cita cita = c.get(); 
+		Cita cita = c.get();
 		JSONObject jso = new JSONObject(info);
 		String dniPaciente = jso.optString("dniPaciente");
 
@@ -250,24 +251,26 @@ public class CitaController {
 
 		Date today = new Date();
 		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-		Date dataFormateada = formato.parse(fechaPrimeraMod); 
-		Date dataFormateada2 = formato.parse(fechaSegundaMod); 
+		Date dataFormateada = formato.parse(fechaPrimeraMod);
+		Date dataFormateada2 = formato.parse(fechaSegundaMod);
 
-		long fechaHOY = new Date(today.getYear(), today.getMonth(), today.getDate(), 0, 0).getTime(); 
-		long fechaPrimeraDosisMS = new Date(dataFormateada.getYear(), dataFormateada.getMonth(), dataFormateada.getDate(), 0, 0).getTime();
-		long fechaSegundaDosisMS = new Date(dataFormateada2.getYear(), dataFormateada2.getMonth(), dataFormateada2.getDate(), 0, 0).getTime();
+		String fechaHOY = LocalDate.now().toString();
+		long fechaPrimeraDosisMS = new Date(dataFormateada.getYear(), dataFormateada.getMonth(),
+				dataFormateada.getDate(), 0, 0).getTime();
+		long fechaSegundaDosisMS = new Date(dataFormateada2.getYear(), dataFormateada2.getMonth(),
+				dataFormateada2.getDate(), 0, 0).getTime();
 
-		long fechaLimitePD = 1641772800000L;//10 de enero de 2022
-		long fechaLimiteSD = 1643587200000L;//31 de enero de 2022
-		if(fechaPrimeraDosisMS<=fechaHOY || fechaSegundaDosisMS<=fechaHOY ) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT,"No puedes viajar en el tiempo");
+		long fechaLimitePD = 1641772800000L;// 10 de enero de 2022
+		long fechaLimiteSD = 1643587200000L;// 31 de enero de 2022
+		if (fechaPrimeraDosisMS <= fechaHOY || fechaSegundaDosisMS <= fechaHOY) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "No puedes viajar en el tiempo");
 		}
-		if(fechaLimitePD<=fechaPrimeraDosisMS || fechaLimiteSD<=fechaSegundaDosisMS ) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT,"No puedes superar las fechas limites");
+		if (fechaLimitePD <= fechaPrimeraDosisMS || fechaLimiteSD <= fechaSegundaDosisMS) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "No puedes superar las fechas limites");
 		}
 
 		String nombre = usuario.getNombre();
-		Cita citaModificada = modificar(dniPaciente, nombreCentro, fechaPrimeraMod, fechaSegundaMod,nombre);
+		Cita citaModificada = modificar(dniPaciente, nombreCentro, fechaPrimeraMod, fechaSegundaMod, nombre);
 		cita.setFechaPrimeraDosis(citaModificada.getFechaPrimeraDosis());
 		cita.setFechaSegundaDosis(citaModificada.getFechaSegundaDosis());
 		return repositoryCita.save(cita);
@@ -277,6 +280,7 @@ public class CitaController {
 	@PutMapping("/definirFormatoVacunacion")
 	/***
 	 * Modificamos una cita
+	 * 
 	 * @param session
 	 * @param info
 	 * @return Formato de vacunacion creado
@@ -285,25 +289,25 @@ public class CitaController {
 	 * @throws NoHayDosisException
 	 * @throws SlotVacunacionSuperadoException
 	 */
-	public void definirFormatoVacunacion(HttpSession session, @RequestBody Map<String, Object> datosFormatoVacunacion) {
+	public void definirFormatoVacunacion(HttpSession session, @RequestBody Map<String, Object> datosFormatoVacunacion)
+			throws ControlHorasVacunacionException {
 
-			JSONObject jso = new JSONObject(datosFormatoVacunacion);
-			String horaInicio = jso.getString("horaInicio");
-			String horaFin = jso.getString("horaFin");
-			int duracionFranja = jso.getInt("duracionFranja");
-			int personasAVacunar = jso.getInt("personasAVacunar");
+		JSONObject jso = new JSONObject(datosFormatoVacunacion);
+		String horaInicio = jso.getString("horaInicio");
+		String horaFin = jso.getString("horaFin");
+		int duracionFranja = jso.getInt("duracionFranja");
+		int personasAVacunar = jso.getInt("personasAVacunar");
 
-			FormatoVacunacion formatoVacunacion = new FormatoVacunacion(horaInicio, horaFin, duracionFranja,
-					personasAVacunar);
-			if (formatoVacunacion.horasCorrectas()) {
-				repositoryFormatoVacunacion.insert(formatoVacunacion);
-			} else {
-				throw new ControlHorasVacunacionException();
-			}
+		FormatoVacunacion formatoVacunacion = new FormatoVacunacion(horaInicio, horaFin, duracionFranja,
+				personasAVacunar);
+		if (formatoVacunacion.horasCorrectas()) {
+			repositoryFormatoVacunacion.insert(formatoVacunacion);
+		} else {
+			throw new ControlHorasVacunacionException();
+		}
 
 	}
-	
-	
+
 	private CentroSanitario obtenerCentro(String nombreCentro) {
 		List<CentroSanitario> listaCentros = repositoryCentro.findAll();
 		for (int i = 0; i < listaCentros.size(); i++) {
@@ -314,29 +318,30 @@ public class CitaController {
 		}
 		return centroSanitario;
 	}
-	
+
 	private void comprobarFechas(LocalDate fecha2, LocalDate fecha1) throws DiasEntreDosisIncorrectosException {
 		if (fecha2.isBefore(fecha1.plusDays(21))) {
 			throw new DiasEntreDosisIncorrectosException();
 		}
 	}
-	
+
 	private void fechasSlot(LocalDate fechaActual, LocalDate nocheVieja) throws SlotVacunacionSuperadoException {
-		LocalDate fechaLimite = LocalDate.parse(""+LocalDate.now().getYear()+"-12-11");
+		LocalDate fechaLimite = LocalDate.parse("" + LocalDate.now().getYear() + "-12-11");
 		if (fechaActual.isAfter(nocheVieja) || fechaActual.isAfter(fechaLimite)) {
 			throw new SlotVacunacionSuperadoException();
 		}
 	}
-	
+
 	private void fechasSlot1(Long aux1, Long nocheVieja, Long aux2) throws SlotVacunacionSuperadoException {
 		if ((aux1 >= nocheVieja) || (aux2 >= nocheVieja)) {
 			throw new SlotVacunacionSuperadoException();
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	/***
 	 * Modificamos una cita controlando mas excepciones
+	 * 
 	 * @param dniPaciente
 	 * @param nombreCentro
 	 * @param fechaPrimeraMod
@@ -348,20 +353,21 @@ public class CitaController {
 	 * @throws NoHayDosisException
 	 * @throws SlotVacunacionSuperadoException
 	 */
-	private Cita modificar(String dniPaciente, String nombreCentro, String fechaPrimeraMod,
-			String fechaSegundaMod,String nombre) throws ParseException, DiasEntreDosisIncorrectosException, NoHayDosisException, SlotVacunacionSuperadoException  {
+	private Cita modificar(String dniPaciente, String nombreCentro, String fechaPrimeraMod, String fechaSegundaMod,
+			String nombre) throws ParseException, DiasEntreDosisIncorrectosException, NoHayDosisException,
+			SlotVacunacionSuperadoException {
 		List<Cita> listaCitas = repositoryCita.findAll();
 		Cita c = new Cita();
 		CentroSanitario centroSanitario = obtenerCentro(nombreCentro);
 
 		LocalDate fecha1 = LocalDate.parse(fechaPrimeraMod);
 		LocalDate fecha2 = LocalDate.parse(fechaSegundaMod);
-		
-		comprobarFechas(fecha2, fecha1); 
-		
+
+		comprobarFechas(fecha2, fecha1);
+
 		LocalDate fechaActual = LocalDate.now();
-		String nocheVieja = ""+LocalDate.now().getYear()+"-12-31"; //Dia 31 de Enero
-		int contadorAforo = 0; // Aforo para el centro que cogemos 
+		String nocheVieja = "" + LocalDate.now().getYear() + "-12-31"; // Dia 31 de Enero
+		int contadorAforo = 0; // Aforo para el centro que cogemos
 		boolean asignada = true;
 		if (listaCitas.isEmpty()) {
 			if (centroSanitario.getDosisTotales() >= 2) {
@@ -382,20 +388,21 @@ public class CitaController {
 		} else {
 			asignada = false;
 			while (!asignada) {
-				for (int i = 0; i < listaCitas.size(); i++) { //Esto ahora mismo no hace nada
+				for (int i = 0; i < listaCitas.size(); i++) { // Esto ahora mismo no hace nada
 					if ((fecha1.getTime() == fechaActual) || (fecha2.getTime() == fechaActual)) {
 						++contadorAforo;
 					}
 				}
+
 				if (contadorAforo >= centroSanitario.getAforo()) {
 					if (new Date(fechaActual).getHours() == centroSanitario.getHoraFin()) {
 						fechaActual += (3600000 * 12); // Proximo dia a las 08.00am
 					} else {
 						fechaActual += 3600000; // Siguiente rango de horas
 					}
-					
+
 					fechasSlot1(aux1, nocheVieja, aux2);
-					
+
 					contadorAforo = 0;
 				} else {
 					++contadorAforo;
@@ -416,114 +423,92 @@ public class CitaController {
 
 		return c;
 	}
-	
-	@SuppressWarnings("deprecation")
+
 	/***
 	 * Creamos una cita
+	 * 
 	 * @param nombreCentro
 	 * @param dniUsuario
-	 * @param nombre 
+	 * @param nombre
 	 * @return cita creada
 	 * @throws SlotVacunacionSuperadoException
 	 * @throws NoHayDosisException
 	 */
-	public Cita crearCita(String nombreCentro, String dniUsuario,String nombre) throws SlotVacunacionSuperadoException, NoHayDosisException { 
+	@PostMapping("/solicitarCita")
+	public void solicitarCita(@RequestBody Map<String, Object> info)
+			throws UsuarioNoExisteException, CupoNoEncontradoException {
+		JSONObject json = new JSONObject(info);
+		String email = json.getString("email");
+		try {
+			Paciente paciente = repositoryPaciente.findByEmail(email);
 
-		List<Cita> listaCitas = repositoryCita.findAll();
-		
-		CentroSanitario centroSanitario = obtenerCentro(nombreCentro);
+			if (paciente == null)
+				throw new UsuarioNoExisteException();
+			
+			List<Cita> listaCitas = repositoryCita.findAllByDniPaciente(paciente.getDni());
+			int citasAsignadas = listaCitas.size();
+			switch (citasAsignadas) {
+			case 0:
+				// Primera
+				asignarDosis(paciente, LocalDate.now());
+				// Segunda
+				asignarDosis(paciente, LocalDate.now().plusDays(21));
+				break;
 
-		LocalDate today = LocalDate.now();
-		//Date tomorrow = new Date(today.getTime() + (1000 * 60 * 60 * 24));
+			case 1:
+				Cita primeraDosis = repositoryCita.findByDniPaciente(paciente.getDni());
+				LocalDate fechaPrimeraCita = LocalDate.parse(primeraDosis.getFecha());
 
-		String fechaActual = ""+today;
-		String nocheVieja = ""+LocalDate.now().getYear()+"-12-1"; //Dia 31 de Enero
-		int contadorAforo = 0; // Aforo para el centro que cogemos
-		boolean asignada = true;
+				// Asignar SegundaDosis
+				asignarDosis(paciente, fechaPrimeraCita.plusDays(21));
 
-		Cita c = new Cita();
-		if(repositoryCita.findByDniPaciente(dniUsuario) != null) { 
-			c = repositoryCita.findByDniPaciente(dniUsuario);
-			asignada = false;
-			while (!asignada) {
-				for (int i = 0; i < listaCitas.size(); i++) {
-					Cita cita = listaCitas.get(i);
-					if ((cita.getFechaSegundaDosis().equals(fechaActual))) {
-						++contadorAforo;
-					}
-				}
-				if (contadorAforo >= centroSanitario.getAforo()) {
-					if (new Date(fechaActual).getHours() == centroSanitario.getHoraFin()) {
-						fechaActual += (3600000 * 12); // Proximo dia a las 08.00am
-					} else {
-						fechaActual += 3600000; // Siguiente rango de horas
-					}
-					
-					fechasSlot(LocalDate.parse(fechaActual), LocalDate.parse(nocheVieja));
-					
-					contadorAforo = 0;
-				} else {
-					++contadorAforo;
-					c.setFechaSegundaDosis(c.getFechaPrimeraDosis() + (1000 * 60 * 60 * 24 * 21));
-					centroSanitario.setDosisTotales(centroSanitario.getDosisTotales() - 1);
-					repositoryCentro.save(centroSanitario);
-					asignada = true;
-					return repositoryCita.save(c);
-				}
+				break;
+
+			case 2:
+				if (paciente.getDosisAdministradas().equals("2"))
+					throw new VacunaException(HttpStatus.FORBIDDEN, "El paciente ya tiene dos dosis administradas");
+				throw new VacunaException(HttpStatus.FORBIDDEN, "El paciente: " + paciente.getDni()
+						+ " ya dispone de dos citas asignadas. Si desea modificar su cita, utilice Modificar Cita");
+
+			default:
+				break;
 			}
-		}else {
-			if (listaCitas.isEmpty()) {
-				if (centroSanitario.getDosisTotales() >= 2) {
-					++contadorAforo;
-					c = new Cita();
-					c.setNombreCentro(centroSanitario.getNombre());
-					c.setFechaPrimeraDosis(fechaActual);
-					c.setFechaSegundaDosis(fechaActual + (1000 * 60 * 60 * 24 * 21));
-					c.setDniPaciente(dniUsuario);
-					c.setNombrePaciente(nombre);
-					repositoryCita.insert(c);
-					centroSanitario.setDosisTotales(centroSanitario.getDosisTotales() - 2);
-					repositoryCentro.save(centroSanitario);
-					return c;
-				} else {
-					throw new NoHayDosisException();
-				}
-				
-			} else {
-				asignada = false;
-				while (!asignada) {
-					for (int i = 0; i < listaCitas.size(); i++) {
-						Cita cita = listaCitas.get(i);
-						if ((cita.getFechaPrimeraDosis() == fechaActual) || (cita.getFechaSegundaDosis() == fechaActual)) {
-							++contadorAforo;
-						}
-					}
-					if (contadorAforo >= centroSanitario.getAforo()) {
-						if (new Date(fechaActual).getHours() == centroSanitario.getHoraFin()) {
-							fechaActual += (3600000 * 12); // Proximo dia a las 08.00am
-						} else {
-							fechaActual += 3600000; // Siguiente rango de horas
-						}
-						
-						fechasSlot(LocalDate.parse(fechaActual), LocalDate.parse(nocheVieja));
+		} catch (VacunaException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
 
-						contadorAforo = 0;
-					} else {
-						++contadorAforo;
-						c.setNombreCentro(centroSanitario.getNombre());
-						c.setFechaPrimeraDosis(fechaActual);
-						c.setFechaSegundaDosis(fechaActual + (1000 * 60 * 60 * 24 * 21));
-						c.setDniPaciente(dniUsuario);
-						c.setNombrePaciente(nombre);
-						repositoryCita.insert(c);
-						centroSanitario.setDosisTotales(centroSanitario.getDosisTotales() - 2);
-						repositoryCentro.save(centroSanitario);
-						asignada = true;
-						return c;
-					}
-				}
+	}
+
+	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario CentroSanitario) {
+		Cupo cupo = null;
+
+		// Para poder coger siempre la primera con un hueco libre por fecha
+		List<Cupo> listaCupos = repositoryCupo.findAllByCentroVacunacion(CentroSanitario);
+		listaCupos.sort(Comparator.comparing(Cupo::getFecha));
+
+		for (int i = 0; i < listaCupos.size(); i++) {
+			cupo = listaCupos.get(i);
+			if (LocalDate.parse(cupo.getFecha()).isAfter(fechaActualDate) && cupo.getPersonasRestantes() > 0) {
+				break;
 			}
 		}
-		return c;
+		return cupo;
+	}
+
+	public void asignarDosis(Usuario usuario, LocalDate fechaActual) throws CupoNoEncontradoException {
+		CentroSanitario centro = repositoryCentro.findByNombre(usuario.getCentroAsignado());
+		Cupo cupoAsignado = buscarCupoLibre(fechaActual, centro);
+		if (cupoAsignado == null) {
+			throw new CupoNoEncontradoException();
+		}
+		repositoryCupo.deleteByFechaAndHoraAndCentroVacunacion(cupoAsignado.getFecha(), cupoAsignado.getHora(),
+				cupoAsignado.getCentroVacunacion());
+		cupoAsignado.setPersonasRestantes(cupoAsignado.getPersonasRestantes() - 1);
+		repositoryCupo.save(cupoAsignado);
+
+		Cita cita = new Cita(cupoAsignado.getFecha(), cupoAsignado.getHora(), usuario.getCentroAsignado(),
+				usuario.getDni());
+		repositoryCita.save(cita);
+
 	}
 }

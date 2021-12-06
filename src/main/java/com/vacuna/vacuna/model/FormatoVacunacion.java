@@ -5,8 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
-
-import com.vacuna.vacuna.exception.FormatoHorasIncorrectasException;
+import com.vacuna.vacuna.exception.ControlHorasVacunacionException;
 
 
 public class FormatoVacunacion {
@@ -62,13 +61,13 @@ public class FormatoVacunacion {
 		this.personasPorFranja = personasPorFranja;
 	}
 
-	public boolean horasCorrectas() throws FormatoHorasIncorrectasException {
+	public boolean horasCorrectas() throws ControlHorasVacunacionException {
 		try {
 			Date horaInicio = new SimpleDateFormat("HH:mm").parse(horaInicioVacunacion);
 			Date horaFin = new SimpleDateFormat("HH:mm").parse(horaFinVacunacion);
 			return horaInicio.before(horaFin);
 		} catch (ParseException e) {
-			throw new FormatoHorasIncorrectasException();
+			throw new ControlHorasVacunacionException();
 		}
 	}
 
