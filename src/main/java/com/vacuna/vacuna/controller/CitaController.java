@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.servlet.http.HttpSession;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -195,6 +197,20 @@ public class CitaController {
 		return null;
 	}
 	
+
+	@GetMapping("/getCitaPorDia/{fecha}")
+	public List<Cita> getCitasPorDia(HttpSession session, @PathVariable String fecha) {
+		String email = (String)session.getAttribute("email");		
+		long diaCita = Long.parseLong(fecha);
+
+		List<Cita> citasPrimeraDosis = repositoryCita.findAllByNombreCentroAndFechaPrimeraDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), diaCita);
+		List<Cita> citasSegundaDosis = repositoryCita.findAllByNombreCentroAndFechaSegundaDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), diaCita);
+		citasPrimeraDosis.addAll(citasSegundaDosis);
+		
+		//Aunque la lista que devuelve el método se llame citasPrimeraDosis, esta contiene tanto las de la priemra como las de la segunda, era por no cambiar el nombre.
+		return citasPrimeraDosis;
+ 	}
+
 	@GetMapping("/getCitasPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
@@ -204,6 +220,7 @@ public class CitaController {
 	public List<Cita> getCitasPaciente(@PathVariable String dni){
 		return repositoryCita.findAllByDniPaciente(dni);
 	}
+
 
 	@GetMapping("/")
 	/***

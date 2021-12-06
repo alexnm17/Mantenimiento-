@@ -35,6 +35,10 @@ public interface CitaDAO extends MongoRepository<Cita, String>{
 	 * @return cita
 	 */
 	List<Cita> findAllByNombreCentro(String nombre);
+	
+	List<Cita> findAllByNombreCentroAndFechaPrimeraDosis(String nombre, long fecha);
+	
+	List<Cita> findAllByNombreCentroAndFechaSegundaDosis(String nombre, long fecha);
 
 	List<Cita> findAllByDniPaciente(String dni);
 
