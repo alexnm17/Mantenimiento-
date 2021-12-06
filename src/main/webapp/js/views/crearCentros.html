@@ -65,9 +65,9 @@
             <h1 class="w3-jumbo"><b>Crear centro</b></h1>
             <h3 class="" style="margin-top:20px"><b>El horario y el aforo es el mismo para todos los centros</b></h3>
             
-            <h3 class="" style="margin-top:20px"  >Hora de inicio: <input type="time" data-bind="value : horaInicio" disabled></h3>
-            <h3 class="" style="margin-top:20px" >Hora de fin: <input type="time" data-bind="value : horaFin" disabled></h3>
-            <h3 class="" style="margin-top:20px" >Aforo: <b data-bind= "html : aforo"></b></h3>
+            <h3 class="" style="margin-top:20px"  >Hora de inicio: <span data-bind="text: horaInicioVacunacion"></span></h3>
+            <h3 class="" style="margin-top:20px" >Hora de fin: <span data-bind="text: horaFinVacunacion"></span></h3>
+            <h3 class="" style="margin-top:20px" >Aforo: <span data-bind="text: aforo"></span></h3>
 
             <form action="">
                 <label>Nombre</label>
@@ -75,15 +75,6 @@
 
                 <label>Dosis totales</label>
                 <input type="text" data-bind="value : dosisTotales" placeholder="Dosis totales">
-
-                <label id="Aforo">Aforo</label>
-                <input type="text" id="aforo" data-bind="value : aforo" placeholder="Aforo">
-
-                <label id="HoraInicio">Hora inicio</label>
-                <input type="text" id="horaInicio"  data-bind="value : horaInicio" placeholder="Hora Inicio">
-
-                <label id="HoraFin">Hora fin</label>
-                <input type="text" id="horaFin"  data-bind="value : horaFin" placeholder="Hora Fin">
 
                 <label>Localidad</label>
                 <input type="text" data-bind="value : localidad" placeholder="Localidad">

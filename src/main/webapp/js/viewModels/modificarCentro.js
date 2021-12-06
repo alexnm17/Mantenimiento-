@@ -11,9 +11,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 			self.nombre = ko.observable(app.centro.nombre);
 			self.dosisTotales = ko.observable(app.centro.dosisTotales);
-			self.aforo = ko.observable(app.centro.aforo);
-			self.horaInicio = ko.observable(app.centro.horaInicio);
-			self.horaFin = ko.observable(app.centro.horaFin);
 			self.localidad = ko.observable(app.centro.localidad);
 			self.provincia = ko.observable(app.centro.provincia);		
 
@@ -62,9 +59,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					id : app.centro.id,
 					nombre : this.nombre(),
 					dosisTotales: this.dosisTotales(),
-					aforo : this.aforo(),
-					horaInicio : this.horaInicio(),
-					horaFin : this.horaFin(),
 					localidad: this.localidad(),
 					provincia: this.provincia(),
 			};

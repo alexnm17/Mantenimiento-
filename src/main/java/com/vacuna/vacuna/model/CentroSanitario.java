@@ -13,7 +13,7 @@ public class CentroSanitario {
 		private String id;
 		private String nombre;
 		private int dosisTotales;
-		private int aforo;
+		//private int aforo;
 		//private int horaInicio;
 		//private int horaFin;
 		private String localidad;
@@ -29,12 +29,10 @@ public class CentroSanitario {
 		 * @param localidad
 		 * @param provincia
 		 */
-		public CentroSanitario(String nombre, int dosisTotales, int aforo, String localidad,
-				String provincia) {
+		public CentroSanitario(String nombre, int dosisTotales, String localidad, String provincia) {
 			super();
 			this.nombre = nombre;
 			this.dosisTotales = dosisTotales; //Valor constante de momento
-			this.aforo = aforo; //Valor constante de momento
 			this.localidad = localidad;
 			this.provincia = provincia;
 		}
@@ -86,17 +84,13 @@ public class CentroSanitario {
 		 * getAforo
 		 * @return aforo
 		 */
-		public int getAforo() {
-			return aforo;
-		}
+		
 		
 		/***
 		 * setAforo
 		 * @param aforo
 		 */
-		public void setAforo(int aforo) {
-			this.aforo = aforo;
-		}
+		
 		
 		/***
 		 * getLocalidad
