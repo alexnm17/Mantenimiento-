@@ -55,7 +55,7 @@ public class FormatoVacunacionController {
 				if (!formatoVacunacion.horasCorrectas())
 					throw new FormatoHorasIncorrectasException();
 			}
-
+			crearPlantillasCitaVacunacion();
 		} catch (FormatoHorasIncorrectasException e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -74,7 +74,6 @@ public class FormatoVacunacionController {
 		return formatoVacunacion;
 	}
 	
-	@PostMapping("/crearPlantillasCitaVacunacion")
 	public void crearPlantillasCitaVacunacion() {
 		FormatoVacunacion formato = getFormatoVacunacion();
 		List<CentroSanitario> centrosVacunacion = centroVacunacionDao.findAll();
