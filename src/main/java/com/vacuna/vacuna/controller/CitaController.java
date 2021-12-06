@@ -205,10 +205,10 @@ public class CitaController {
 	@GetMapping("/getCitaPorDia/{fecha}")
 	public List<Cita> getCitasPorDia(HttpSession session, @PathVariable String fecha) {
 		String email = (String)session.getAttribute("email");		
-		long diaCita = Long.parseLong(fecha);
+		
 
-		List<Cita> citasPrimeraDosis = repositoryCita.findAllByNombreCentroAndFechaPrimeraDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), diaCita);
-		List<Cita> citasSegundaDosis = repositoryCita.findAllByNombreCentroAndFechaSegundaDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), diaCita);
+		List<Cita> citasPrimeraDosis = repositoryCita.findAllByNombreCentroAndFechaPrimeraDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
+		List<Cita> citasSegundaDosis = repositoryCita.findAllByNombreCentroAndFechaSegundaDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
 		citasPrimeraDosis.addAll(citasSegundaDosis);
 		
 		//Aunque la lista que devuelve el método se llame citasPrimeraDosis, esta contiene tanto las de la priemra como las de la segunda, era por no cambiar el nombre.
