@@ -16,9 +16,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.tipoUsuario = ko.observable("");
 			self.centroAsignado = ko.observable("");
 			self.dosisAdministradas = ko.observable("");	
-			
-			self.horaInicio = ko.observable("");
-			self.horaFin = ko.observable("");
 
 			self.cita = ko.observable("");
 			self.fechaPrimeraDosis = ko.observable("");
@@ -56,18 +53,18 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				type : "get",
 				contentType : 'application/json',
 				success : function(response) {
-					 for (let i=0; i<response.length; i++) {
+					 for (let centro of response) {
 						let centro = {
-							id : response[i].id,
-							nombre : response[i].nombre,
-							dosisTotales: response[i].dosisTotales,
-							aforo : response[i].aforo,
-							horaInicio : response[i].horaInicio,
-							horaFin : response[i].horaFin,
-							localidad : response[i].localidad,
-							provincia : response[i].provincia,
+							id : centro.id,
+							nombre : centro.nombre,
+							dosisTotales: centro.dosisTotales,
+							aforo : centro.aforo,
+							horaInicio : centro.horaInicio,
+							horaFin : centro.horaFin,
+							localidad : centro.localidad,
+							provincia : centro.provincia,
 							eliminar : function() {
-								self.eliminarUsuario(response[i].dni); 
+								self.eliminarUsuario(centro.dni); 
 							},
 							
 							modificarCentros : function() {
@@ -76,8 +73,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							},
 												
 						};
-						self.horaInicio((response[i].horaInicio < 10 ? "0":"")+response[i].horaInicio+":00:00");
-						self.horaFin((response[i].horaFin < 10 ? "0":"")+response[i].horaFin+":00:00");
+						self.horaInicio((centro.horaInicio < 10 ? "0":"")+centro.horaInicio+":00:00");
+						self.horaFin((centro.horaFin < 10 ? "0":"")+centro.horaFin+":00:00");
 					}
 				},
 				error : function(response) {
@@ -90,31 +87,16 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		
 		solicitarCita() {
 			let self = this;
-
-			var time = new Date().getTime();
-
 			let info = {
 					dni : self.dniUsuario(),
 			};
 
 			let data = {
-
 					data: JSON.stringify(info),
 					url : "cita/add",
-					type : "put",
+					type : "post",
 					contentType : 'application/json',
-					success : function(response) {
-
-						var date = new Date (response.fechaPrimeraDosis)
-						date.toLocaleString();
-						var date2 = new Date (response.fechaSegundaDosis)
-						date2.toLocaleString();
-
-						self.fechaPrimeraDosis(date.toLocaleString());
-						self.fechaSegundaDosis(date2.toLocaleString());
-						self.centroAsignado(app.user.centroAsignado);
-						
-						
+					success : function(response) {								
 						$.confirm({
 							title: 'Confirmado',
 							content: 'Cita Creada',
@@ -122,6 +104,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							typeAnimated: true,
 							buttons: {
 								Cerrar: function () {
+									location.reload();
 								}
 							}
 						});
@@ -161,64 +144,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type : "get",
 					contentType : 'application/json',
 					success : function(response) {
-						self.citas([]);
-						
-							var date = new Date(response.fechaPrimeraDosis);
-							var fecha = "";
-							if(response.fechaSegundaDosis == 0){
-								console.log("Deberia borrar la cita");
-								
-								var centroAsignado = response.nombreCentro;
-								let cita = {
-										id : response.id,
-										dniUsuario : self.dniUsuario(),
-										centroAsignado: response.nombreCentro,
-										fechaPrimeraDosis: date.toLocaleString(),
-										fechaSegundaDosis : fecha,
-										eliminarCita : function() {
-											self.eliminarCitaCompleta(response.id);
-										},
-										modificarCita : function() {
-											app.cita = this;
-											app.router.go({ path: "modificarCita" });
-										},	
-								};
-								
-								if(typeof response.fechaPrimeraDosis != 'undefined'){
-									self.citas.push(cita);
-									self.tablaCita(1);
-								}else{
-									self.tablaCita(2);
-								}
-							}
-							else{
-								var date2 = new Date(response.fechaSegundaDosis);
-								fecha = date2.toLocaleString();
-								var centroAsignado = response.nombreCentro;
-								let cita = {
-										id : response.id,
-										dniUsuario : self.dniUsuario(),
-										centroAsignado: response.nombreCentro,
-										fechaPrimeraDosis: date.toLocaleString(),
-										fechaSegundaDosis : fecha,
-										eliminarCita : function() {
-											app.cita = this;
-											app.router.go({ path: "eliminarCita" });
-										},
-										modificarCita : function() {
-											app.cita = this;
-											app.router.go({ path: "modificarCita" });
-										},	
-								};
-								
-								if(typeof response.fechaPrimeraDosis != 'undefined'){
-									self.citas.push(cita);
-									self.tablaCita(1);
-								}else{
-									self.tablaCita(2);
-								}
-							}
-
+						console.log(response)
+						self.citas(response);
 					},
 					error : function(response) {
 						$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
@@ -327,11 +254,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		}
 
 
-		modificarCita(id){
-			app.idc = id;
-			app.cita = this;
+		modificarCita(){
 			app.router.go({ path: "modificarCita" });
-			self.getCitaPaciente();
 		}
 		
 		eliminarCita(id){

@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.vacuna.vacuna.dao.CentroSanitarioDAO;
 import com.vacuna.vacuna.dao.CitaDAO;
+import com.vacuna.vacuna.dao.FormatoVacunacionDAO;
 import com.vacuna.vacuna.dao.UsuarioDAO;
 import com.vacuna.vacuna.exception.CentrosNoEncontradosException;
 import com.vacuna.vacuna.exception.CitasNoEncontradasException;
@@ -58,7 +59,7 @@ public class CitaController {
 	private CitaDAO repositoryCita;
 
 	@Autowired
-	private FormatoVacunacionDao repositoryFormatoVacunacion;
+	private FormatoVacunacionDAO repositoryFormatoVacunacion;
 	
 	@Autowired
 	private CentroSanitarioDAO repositoryCentro;
@@ -192,13 +193,8 @@ public class CitaController {
 	 * @param dni
 	 * @return null
 	 */
-	public Cita getCitaPaciente(@PathVariable String dni) {
-		Cita c = repositoryCita.findByDniPaciente(dni);
-
-		if (c != null) {
-			return c;
-		}
-		return null;
+	public List<Cita> getCitaPaciente(@PathVariable String dni) {
+		return repositoryCita.findAllByDniPaciente(dni);
 	}
 	
 
