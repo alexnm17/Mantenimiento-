@@ -3,6 +3,7 @@ package com.vacuna.vacuna.controller;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ import com.vacuna.vacuna.model.Administrador;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
 import com.vacuna.vacuna.model.Paciente;
+import com.vacuna.vacuna.model.PersonalDeCitas;
 import com.vacuna.vacuna.model.Sanitario;
 import com.vacuna.vacuna.model.Usuario;
 
@@ -99,7 +101,7 @@ public class UsuarioController {
 
 		byte[] pwd = md.digest(password.getBytes());
 		
-		Usuario u = new Usuario(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
+		Usuario u;
 		
 		if(!formValido(nombre, email, dni, centroAsignado, tipoUsuario, password)) {
 			throw new DatosIncompletosException();
@@ -125,6 +127,9 @@ public class UsuarioController {
 			break;
 		case "Sanitario":
 			u = new Sanitario(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
+			break;
+		case "Personal de Citas":
+			u = new PersonalDeCitas(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
 			break;
 		default:
 			throw new UsuarioNoExisteException();
@@ -182,18 +187,11 @@ public class UsuarioController {
 		for(int i= 0; i < citas.size(); i++) {	
 			Paciente paciente = (Paciente) repository.findByDni(citas.get(i).getDniPaciente());
 			Cita c =  repositoryCita.findByDniPaciente(paciente.getDni());
-			long fechaPrimeraDosis = c.getFechaPrimeraDosis();
-			long fechaSegundaDosis = c.getFechaSegundaDosis();
-			
-			Date d1 = new Date(fechaPrimeraDosis);
-			Date d2 = new Date(fechaSegundaDosis);
-			Date today = new Date();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-			String fechaHOY = sdf.format(today);
-			String fechaPD = sdf.format(d1);
-			String fechaSD = sdf.format(d2);
-			
-		    if(fechaPD.equals(fechaHOY) || fechaSD.equals(fechaHOY) ) {
+			String fechaPrimeraDosis = c.getFechaPrimeraDosis();
+			String fechaSegundaDosis = c.getFechaSegundaDosis();
+			LocalDate today = LocalDate.now();
+		
+		    if(LocalDate.parse(fechaPrimeraDosis).isEqual(today) || LocalDate.parse(fechaSegundaDosis).equals(today) ) {
 				dosis.add(Integer.parseInt(paciente.getDosisAdministradas()));
 			}
 			

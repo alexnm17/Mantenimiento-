@@ -9,17 +9,16 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.centros = ko.observableArray([]);
 			self.id = ko.observable("");
 			self.nombre = ko.observable("");
-			self.horaInicio = ko.observable("");
-			self.horaFin = ko.observable("");
 			self.dosisTotales = ko.observable("");
-			self.aforo = ko.observable("");
 			self.localidad = ko.observable("");
 			self.provincia = ko.observable("");		
 			
 			self.nombreUsuario = ko.observable("");
 			self.tipoUsuario = ko.observable("");
 			
-
+			self.aforo = ko.observable("");
+			self.horaInicioVacunacion = ko.observable("");
+			self.horaFinVacunacion = ko.observable("");
 			
 			// Header Config
 			self.headerConfig = ko.observable({
@@ -86,54 +85,16 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "solicitarCita" });
 			}
 		
-		getCentros() {
+		getFormatoVacunacion() {
 			let self = this;
 			let data = {
-				url : "centro/getTodos",
+				url : "formato/getFormatoVacunacion",
 				type : "get",
 				contentType : 'application/json',
 				success : function(response) {
-					self.centros([]);
-					 for (let i=0; i<response.length; i++) {
-						let centro = {
-							id : response[i].id,
-							nombre : response[i].nombre,
-							dosisTotales: response[i].dosisTotales,
-							aforo : response[i].aforo,
-							horaInicio : response[i].horaInicio,
-							horaFin : response[i].horaFin,
-							localidad : response[i].localidad,
-							provincia : response[i].provincia,
-							eliminar : function() {
-								self.eliminarUsuario(response[i].dni); 
-							},
-							
-							modificarCentros : function() {
-								app.centro = this;
-								app.router.go({ path: "modificarCentro" });
-							},
-												
-						};
-						self.aforo(response[i].aforo);
-						self.horaInicio((response[i].horaInicio < 10 ? "0":"")+response[i].horaInicio+":00:00");
-						self.horaFin((response[i].horaFin < 10 ? "0":"")+response[i].horaFin+":00:00");
-						self.centros.push(centro);
-					}
-					if(response.length>0){
-						document.getElementById("horaInicio").style.display='none';
-						document.getElementById("HoraInicio").style.display='none';
-						document.getElementById("aforo").style.display='none';
-						document.getElementById("Aforo").style.display='none';
-						document.getElementById("horaFin").style.display='none';
-						document.getElementById("HoraFin").style.display='none';
-					}else{
-						document.getElementById("horaInicio").style.display='inline';
-						document.getElementById("aforo").style.display='inline';
-						document.getElementById("horaFin").style.display='inline';
-						document.getElementById("HoraInicio").style.display='inline';
-						document.getElementById("Aforo").style.display='inline';
-						document.getElementById("HoraFin").style.display='inline';
-					}
+						self.horaInicioVacunacion(response.horaInicioVacunacion);
+						self.horaFinVacunacion(response.horaFinVacunacion);
+						self.aforo(response.personasPorFranja);
 				},
 				error : function(response) {
 					$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
@@ -208,11 +169,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			let info = {
 				nombre : this.nombre(),
 				dosisTotales: this.dosisTotales(),
-				aforo : this.aforo(),
 				localidad: this.localidad(),
 				provincia: this.provincia(),
-				horaInicio : this.horaInicio(),
-				horaFin : this.horaFin(),
 			};
 			let data = {
 				data : JSON.stringify(info),
@@ -220,7 +178,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				type : "put",
 				contentType : 'application/json',
 				success : function(response) {
-					
 					$.confirm({
 						title: 'Confirmado',
 						content: 'Centro Guardado',
@@ -270,7 +227,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			accUtils.announce('Inicio page loaded.');
 			document.title = "Crear centro";
 			this.comprobarRol();
-			this.getCentros();
+			this.getFormatoVacunacion();
 			this.getUserConnect();
 		};
 

@@ -142,6 +142,26 @@ public class LoginController {
 		return aprobado;
 	}
 	
+	@GetMapping("/comprobarRolPersonalDeCitas")
+	/***
+	 * Comprobamos que el usuario que inicia sesion es personal de citas
+	 * @param request
+	 * @return rol personalDeCitas
+	 * @throws FalloRolUsuarioException
+	 */
+	public @ResponseBody String comprobarRolPersonalDeCitas(HttpServletRequest request) throws FalloRolUsuarioException {
+		try {
+			String email = (String) request.getSession().getAttribute(userEmail);
+			Usuario u = userRepository.findByEmail(email);
+			if(u == null || !u.getTipoUsuario().equalsIgnoreCase("Personal de Citas")) {
+				return denegado;
+			}
+		} catch (Exception e) {
+			throw new FalloRolUsuarioException();
+		}
+		return aprobado;
+	}
+	
 	@GetMapping("/getUser")
 	/***
 	 * 

@@ -1,34 +1,21 @@
+
 define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 	'jquery'], function(ko, app, moduleUtils, accUtils, $) {
-
-
-
 
 		class InicioViewModel {
 			constructor() {
 				var self = this;
 
-
-
-				self.mostrarUsuario = ko.observable(0);
-				self.mostrarCentro = ko.observable(0);
-
-
-
-				self.centros = ko.observableArray([]);
-				self.usuarios = ko.observableArray([]);
 				self.nombre = ko.observable("");
-				self.apellidos = ko.observable("");
-				self.dni = ko.observable("");
 				self.tipoUsuario = ko.observable("");
-				self.centroAsignado = ko.observable("");
-				self.dosisAdministradas = ko.observable("");
-				self.localidad = ko.observable("");
-				self.provincia = ko.observable("");
 
-				var hoy = new Date();
-				self.fecha = ko.observable(hoy.toLocaleString().split(' ')[0]);
+				self.horaInicio = ko.observable("");
+				self.horaFin = ko.observable("");
+				self.duracionFranja = ko.observable(0);
+				self.personasAVacunar = ko.observable(0);
 
+				self.hayDatos = ko.observable(true);
+				self.noHayDatos = ko.observable(false);
 
 				var dropdown = document.getElementsByClassName("dropdown-btn");
 				var i;
@@ -44,12 +31,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					});
 				}
 
-
-
 				self.message = ko.observable(null);
 				self.error = ko.observable(null);
-
-
 
 				// Header Config
 				self.headerConfig = ko.observable({
@@ -66,22 +49,15 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				})
 			}
 
-
-
-
 			w3_open() {
 				document.getElementById("mySidebar").style.display = "block";
 				document.getElementById("myOverlay").style.display = "block";
 			}
 
-
-
 			w3_close() {
 				document.getElementById("mySidebar").style.display = "none";
 				document.getElementById("myOverlay").style.display = "none";
 			}
-
-
 
 			onClick(element) {
 				document.getElementById("img01").src = element.src;
@@ -90,9 +66,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				captionText.innerHTML = element.alt;
 			}
 
-
-
-
 			getUserConnect() {
 				let self = this;
 				let data = {
@@ -100,9 +73,36 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "get",
 					contentType: 'application/json',
 					success: function(response) {
-
 						self.nombre(response[0]);
 						self.tipoUsuario(response[1]);
+					},
+					error: function(response) {
+						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
+
+					}
+				};
+				$.ajax(data);
+			}
+
+			getFormatoVacunacion() {
+				let self = this;
+				let data = {
+					url: "formato/getFormatoVacunacion",
+					type: "get",
+					contentType: 'application/json',
+					success: function(response) {
+						if (response != null) {
+							self.hayDatos(true);
+							self.noHayDatos(false);
+							
+							self.horaInicio(response.horaInicioVacunacion);
+							self.horaFin(response.horaFinVacunacion);
+							self.duracionFranja(response.duracionFranjaVacunacion);
+							self.personasAVacunar(response.personasPorFranja);
+						} else {
+							self.hayDatos(false);
+							self.noHayDatos(true);
+						}
 					},
 					error: function(response) {
 						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
@@ -116,13 +116,9 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "gestionUsuarios" });
 			}
 
-
-
 			crearUsuarios() {
 				app.router.go({ path: "crearUsuarios" });
 			}
-
-
 
 			gestionCentros() {
 				app.router.go({ path: "gestionCentros" });
@@ -148,7 +144,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "definirCupos" });
 			}
 
-
 			logout() {
 				let self = this;
 				let data = {
@@ -157,37 +152,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					contentType: 'application/json',
 					success: function(response) {
 						app.router.go({ path: "login" });
-					},
-					error: function(response) {
-						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
-
-					}
-				};
-				$.ajax(data);
-			}
-
-			comprobarCentros() {
-				let self = this;
-				let data = {
-					url: "centro/comprobarCentros",
-					type: "get",
-					contentType: 'application/json',
-					success: function(response) {
-						console.log(response);
-						if (response == 1) {
-							$.confirm({
-								title: 'Alerta',
-								content: 'No hay centros creados',
-								type: 'red',
-								typeAnimated: true,
-								buttons: {
-									Crear: function() {
-										app.router.go({ path: "crearCentros" });
-									}
-								}
-							});
-
-						}
 					},
 					error: function(response) {
 						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
@@ -216,14 +180,74 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				$.ajax(data);
 			}
 
+			definirCuposHandler() {
+				var self = this;
+				let info = {
+					horaInicio: this.horaInicio(),
+					horaFin: this.horaFin(),
+					duracionFranja: this.duracionFranja(),
+					personasAVacunar: this.personasAVacunar()
+				};
+				let data = {
+					data: JSON.stringify(info),
+					url: "formato/definirFormatoVacunacion",
+					type: "post",
+					contentType: 'application/json',
+					success: function(response) {
+						self.crearCupos();
+						$.confirm({
+							title: 'Confirmado',
+							content: 'Formato definido',
+							type: 'green',
+							typeAnimated: true,
+							buttons: {
+								Cerrar: function() {
+									location.reload();
+								}
+							}
+						});
 
+					},
+					error: function(response) {
+						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
+
+					}
+				};
+				$.ajax(data);
+			}
+			
+			crearCupos(){
+				let data = {
+					url: "formato/crearPlantillasCitaVacunacion",
+					type: "post",
+					success: function(response) {
+						$.confirm({
+							title: 'Confirmado',
+							content: 'Cupos creados',
+							type: 'green',
+							typeAnimated: true,
+							buttons: {
+								Cerrar: function() {
+									location.reload();
+								}
+							}
+						});
+
+					},
+					error: function(response) {
+						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
+
+					}
+				};
+				$.ajax(data);
+			}
 
 			connected() {
 				accUtils.announce('Inicio page loaded.');
-				document.title = "Inicio";
+				document.title = "Definición de cupos";
 				this.comprobarRol();
+				this.getFormatoVacunacion();
 				this.getUserConnect();
-				this.comprobarCentros();
 			};
 
 
@@ -271,14 +295,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					});
 				}
 			}
-
-
-
-
-
 		}
-
-
 
 		return InicioViewModel;
 	});
