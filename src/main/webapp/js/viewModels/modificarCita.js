@@ -10,6 +10,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				self.tipoUsuario = ko.observable("");
 				self.dniPaciente = ko.observable(localStorage.getItem("dniUsuarioAAdministrar"));
 				self.fechaAConsultar = ko.observable("");
+				self.cupos = ko.observableArray([]);
+
 
 				// Header Config
 				self.headerConfig = ko.observable({
@@ -104,7 +106,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "get",
 					contentType: 'application/json',
 					success: function(response) {
-						alert("cupos obtenidos")
+						self.cupos(response)
+						console.log(self.cupos())
 					},
 					error: function(response) {
 						alert("cupos no obtenidos");
