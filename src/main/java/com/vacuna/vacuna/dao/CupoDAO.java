@@ -15,7 +15,7 @@ public interface CupoDAO extends MongoRepository<Cupo, String> {
 
 	Cupo findByFechaAndHoraAndCentroSanitario(String fecha, String hora, CentroSanitario centro);
 
-	List<Cupo> findAllByCentroSanitarioAndFecha(CentroSanitario centroVacunacion, String fecha);
+	List<Cupo> findAllByCentroSanitarioAndFecha(CentroSanitario centroSanitario, String fecha);
 
 	List<Cupo> findAllByCentroSanitario(CentroSanitario centroVacunacion);
 
