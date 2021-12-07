@@ -151,33 +151,13 @@ public class CitaController {
 	 * @return cita eliminada
 	 * @throws ParseException
 	 */
-	public Cita eliminarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException{
-
+	public void eliminarCita(@PathVariable String id){
 		Optional<Cita> c = repositoryCita.findById(id);
-		Cita cita = new Cita();
-
 		if (c.isPresent()) {
-			cita = c.get();
+			repositoryCita.deleteById(id);
 		}
-
-
-		JSONObject jso = new JSONObject(info);
-		String nombreCentro = jso.optString("centrosSanitarios");
-		String fechaPrimeraMod = jso.getString("fechaPrimeraDosis");
-
-		CentroSanitario cs = repositoryCentro.findByNombre(nombreCentro);
-		cs.setDosisTotales(cs.getDosisTotales() + 1);
-		repositoryCentro.save(cs);
-
-		DateFormat fechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		Date citaMod = fechaHora.parse(fechaPrimeraMod);
-
-		/*cita.setFechaPrimeraDosis(citaMod.getTime());
-
-		cita.setFechaSegundaDosis(0);
-		*/
-
-		return repositoryCita.save(cita);
+		else throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No se ha encontrado la cita a eliminar. Por favor contacte con un administrador");
+		
 	}
 
 	@GetMapping("/getCitaPaciente/{dni}")
@@ -321,9 +301,9 @@ public class CitaController {
 				++contadorAforo;
 				c = new Cita();
 				c.setNombreCentro(centroSanitario.getNombre());
-				c.setFechaPrimeraDosis(aux1);
-
-				c.setFechaSegundaDosis(aux2);
+				c.setFechaPrimeraDosis(fechaPrimeraMod);
+				c.setFechaSegundaDosis(fechaSegundaMod);
+				
 				c.setDniPaciente(dniPaciente);
 				c.setNombrePaciente(nombre);
 				centroSanitario.setDosisTotales(centroSanitario.getDosisTotales() - 2);
