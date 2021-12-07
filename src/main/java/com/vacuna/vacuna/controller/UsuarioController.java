@@ -185,8 +185,8 @@ public class UsuarioController {
 		List<Cita> citas = repositoryCita.findAllByNombreCentro(cs.getNombre());
 		List<Integer> dosis = new ArrayList<>();
 		for(int i= 0; i < citas.size(); i++) {	
-			Paciente paciente = (Paciente) repository.findByDni(citas.get(i).getDniPaciente());
-			Cita c =  repositoryCita.findByDniPaciente(paciente.getDni());
+			Cita c =citas.get(i);
+			Paciente paciente = (Paciente) repository.findByDni(c.getDniPaciente());
 			String fechaPrimeraDosis = c.getFechaPrimeraDosis();
 			String fechaSegundaDosis = c.getFechaSegundaDosis();
 			LocalDate today = LocalDate.now();
