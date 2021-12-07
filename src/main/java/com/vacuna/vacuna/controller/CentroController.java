@@ -50,6 +50,7 @@ public class CentroController {
 	 * @throws DatosIncompletosException
 	 */
 	public CentroSanitario add(@RequestBody Map<String, Object> info) throws ControlHorasVacunacionException, DatosIncompletosException {
+		System.out.println("hola");
 		JSONObject jso = new JSONObject(info);
 		String nombre = jso.optString("nombre");
 		String dosisT = jso.optString("dosisTotales");
@@ -59,33 +60,7 @@ public class CentroController {
 			throw new DatosIncompletosException();
 		}
 		int dosisTotales = Integer.parseInt(dosisT);
-		int aforo = 0;  
-
-		int hInicio = 0;
-		int hFin = 0;
-		List<CentroSanitario> listCentro = repository.findAll();
-		if(listCentro.isEmpty()) { 
-			 //hInicio = listCentro.get(0).getHoraInicio();
-			 //hFin = listCentro.get(0).getHoraFin();
-			 aforo = listCentro.get(0).getAforo();
-		}else {
-			 String af = jso.optString("aforo");
-			 String horaInicio = jso.optString("horaInicio");
-			 String horaFin = jso.optString("horaFin");
-			 if(!formValido(af, horaInicio, horaFin, provincia)) {
-				 throw new DatosIncompletosException();
-				} 
-			 aforo = Integer.parseInt(af);
-			 if(aforo==0){
-				throw new DatosIncompletosException(); 
-				}
-			 hInicio = Integer.parseInt(horaInicio);
-			 hFin = Integer.parseInt(horaFin);
-			 if(hInicio>=hFin) {
-				 throw new ControlHorasVacunacionException();
-			 }
-		}
-		CentroSanitario c = new CentroSanitario(nombre, dosisTotales, aforo, localidad, provincia);
+		CentroSanitario c = new CentroSanitario(nombre, dosisTotales, localidad, provincia);
 		  
 		return repository.insert(c);
 
@@ -154,44 +129,21 @@ public class CentroController {
 		JSONObject jso = new JSONObject(info);
 		String nombre = jso.optString("nombre");
 		String dosisT = jso.optString("dosisTotales");
-		String af = jso.optString("aforo");
-		String horaIncicio = jso.optString("horaInicio");
-		String horaFin = jso.optString("horaFin");
 		String localidad = jso.optString("localidad");
 		String provincia = jso.optString("provincia");
 		
-		if(!formValido(nombre, dosisT, af, horaIncicio, horaFin, localidad, provincia)) {
+		if(!formValido(nombre, dosisT, localidad, provincia)) {
 			throw new DatosIncompletosException();
 		}
 		
 		int dosisTotales = Integer.parseInt(dosisT);
-		int aforo = Integer.parseInt(af);
-		if(aforo==0){
-			throw new DatosIncompletosException(); 
-		}
-		int hInicio = Integer.parseInt(horaIncicio);
-		int hFin = Integer.parseInt(horaFin);
-		if(hInicio>=hFin) {
-			 throw new ControlHorasVacunacionException();
-		 }
 		
 		CentroSanitario centro = new CentroSanitario();
 		if (optCentroSanitario.isPresent()) {
 			centro = optCentroSanitario.get();
 		}
-		List<CentroSanitario> listCentro = repository.findAll();
-		for(int i=0;i<listCentro.size();i++) {
-			CentroSanitario cs = listCentro.get(i);
-			listCentro.get(i).setAforo(aforo);
-			//listCentro.get(i).setHoraInicio(hInicio);
-			//listCentro.get(i).setHoraFin(hFin);
-			repository.save(cs);
-		}
-
+	
 		centro.setNombre(nombre);
-		centro.setAforo(aforo);
-		//centro.setHoraInicio(hInicio);
-		//centro.setHoraFin(hFin);
 		centro.setLocalidad(localidad);
 		centro.setProvincia(provincia);
 		centro.setDosisTotales(dosisTotales);

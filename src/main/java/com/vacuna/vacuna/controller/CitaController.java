@@ -189,14 +189,22 @@ public class CitaController {
 	 * @param dni
 	 * @return null
 	 */
-	public Cita getCitaPaciente(@PathVariable String dni) {
-		Cita c = repositoryCita.findByDniPaciente(dni);
-
-		if (c != null) {
-			return c;
-		}
-		return null;
+	public List<Cita> getCitaPaciente(@PathVariable String dni) {
+		return repositoryCita.findAllByDniPaciente(dni);
 	}
+
+	@GetMapping("/getCitaPorDia/{fecha}")
+	public List<Cita> getCitasPorDia(HttpSession session, @PathVariable String fecha) {
+		String email = (String)session.getAttribute("email");		
+		
+
+		List<Cita> citasPrimeraDosis = repositoryCita.findAllByNombreCentroAndFechaPrimeraDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
+		List<Cita> citasSegundaDosis = repositoryCita.findAllByNombreCentroAndFechaSegundaDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
+		citasPrimeraDosis.addAll(citasSegundaDosis);
+		
+		//Aunque la lista que devuelve el método se llame citasPrimeraDosis, esta contiene tanto las de la priemra como las de la segunda, era por no cambiar el nombre.
+		return citasPrimeraDosis;
+ 	}
 
 	@GetMapping("/getCitasPaciente/{dni}")
 	/***
@@ -208,6 +216,7 @@ public class CitaController {
 	public List<Cita> getCitasPaciente(@PathVariable String dni) {
 		return repositoryCita.findAllByDniPaciente(dni);
 	}
+
 
 	@GetMapping("/")
 	/***

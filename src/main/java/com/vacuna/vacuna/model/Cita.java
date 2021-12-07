@@ -17,15 +17,15 @@ public class Cita {
 	private String fecha;
 	private String hora;
 	private String nombreCentro;
-	private String usuario;
+	private String dniPaciente;
 	private boolean isUsada;
 
-	public Cita(String fecha, String hora, String nombreCentro, String usuario) {
+	public Cita(String fecha, String hora, String nombreCentro, String dniPaciente) {
 		this.id = UUID.randomUUID().toString();
 		this.fecha = fecha;
 		this.hora = hora;
 		this.nombreCentro = nombreCentro;
-		this.usuario = usuario;
+		this.dniPaciente = dniPaciente;
 	}
 
 	public Cita() {
@@ -64,12 +64,12 @@ public class Cita {
 		this.nombreCentro = nombreCentro;
 	}
 
-	public String getUsuario() {
-		return usuario;
+	public String getDniPaciente() {
+		return dniPaciente;
 	}
 
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
+	public void setDniPaciente(String dniPaciente) {
+		this.dniPaciente = dniPaciente;
 	}
 
 	public boolean isUsada() {

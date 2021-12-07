@@ -194,9 +194,36 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "post",
 					contentType: 'application/json',
 					success: function(response) {
+						self.crearCupos();
 						$.confirm({
 							title: 'Confirmado',
 							content: 'Formato definido',
+							type: 'green',
+							typeAnimated: true,
+							buttons: {
+								Cerrar: function() {
+									location.reload();
+								}
+							}
+						});
+
+					},
+					error: function(response) {
+						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
+
+					}
+				};
+				$.ajax(data);
+			}
+			
+			crearCupos(){
+				let data = {
+					url: "formato/crearPlantillasCitaVacunacion",
+					type: "post",
+					success: function(response) {
+						$.confirm({
+							title: 'Confirmado',
+							content: 'Cupos creados',
 							type: 'green',
 							typeAnimated: true,
 							buttons: {

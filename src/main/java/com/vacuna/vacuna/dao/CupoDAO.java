@@ -11,14 +11,14 @@ public interface CupoDAO extends MongoRepository<Cupo, String> {
 
 	Cupo findByFechaAndHora(String fecha, String hora);
 
-	void deleteByFechaAndHoraAndCentroVacunacion(String fecha, String hora, CentroSanitario vacunacion);
+	void deleteByFechaAndHoraAndCentroSanitario(String fecha, String hora, CentroSanitario vacunacion);
 
-	Cupo findByFechaAndHoraAndCentroVacunacion(String fecha, String hora, CentroSanitario centro);
+	Cupo findByFechaAndHoraAndCentroSanitario(String fecha, String hora, CentroSanitario centro);
 
-	List<Cupo> findAllByCentroVacunacionAndFecha(CentroSanitario centroVacunacion, String fecha);
+	List<Cupo> findAllByCentroSanitarioAndFecha(CentroSanitario centroSanitario, String fecha);
 
-	List<Cupo> findAllByCentroVacunacion(CentroSanitario centroVacunacion);
+	List<Cupo> findAllByCentroSanitario(CentroSanitario centroVacunacion);
 
-	Cupo findAllByCentroVacunacionAndFechaAndHora(CentroSanitario centroVacunacion, String fecha, String hora);
+	Cupo findAllByCentroSanitarioAndFechaAndHora(CentroSanitario centroVacunacion, String fecha, String hora);
 
 }
