@@ -492,7 +492,7 @@ public class CitaController {
 		Cupo cupo = null;
 
 		// Para poder coger siempre la primera con un hueco libre por fecha
-		List<Cupo> listaCupos = repositoryCupo.findAllByCentroVacunacion(CentroSanitario);
+		List<Cupo> listaCupos = repositoryCupo.findAllByCentroSanitario(CentroSanitario);
 		listaCupos.sort(Comparator.comparing(Cupo::getFecha));
 
 		for (int i = 0; i < listaCupos.size(); i++) {
@@ -510,7 +510,7 @@ public class CitaController {
 		if (cupoAsignado == null) {
 			throw new CupoNoEncontradoException();
 		}
-		repositoryCupo.deleteByFechaAndHoraAndCentroVacunacion(cupoAsignado.getFecha(), cupoAsignado.getHora(),
+		repositoryCupo.deleteByFechaAndHoraAndCentroSanitario(cupoAsignado.getFecha(), cupoAsignado.getHora(),
 				cupoAsignado.getCentroVacunacion());
 		cupoAsignado.setPersonasRestantes(cupoAsignado.getPersonasRestantes() - 1);
 		repositoryCupo.save(cupoAsignado);

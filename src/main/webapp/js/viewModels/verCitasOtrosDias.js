@@ -16,8 +16,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.segundaDosis = ko.observable("");
 			self.tipoUsuario = ko.observable("");
 			self.centroAsignado = ko.observable("");
-			self.fechaPrimeraDosis = ko.observable("");
-			self.fechaSegundaDosis = ko.observable("");
+			self.fecha = ko.observable("");
+			self.hora = ko.observable("");
 			self.dosisAdministradas = ko.observable("");
 
 			self.mensaje= ko.observable(2);
@@ -40,9 +40,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			})
 		}	
 
-
-
-		getCitas(email) {
+		buscarOtroDia(email, fecha) {
 			let self = this;
 			let data = {
 					url : "cita/getCentroSanitario/"+ email,
@@ -52,29 +50,21 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 						self.citas([]);
 						var centroAsignado;
 						var date;
-						var date2;
+						var time;
 						for (let i=0; i<response.length; i++) {
-							date = new Date(response[i].fechaPrimeraDosis);
-							date2 = new Date(response[i].fechaSegundaDosis);
+							fecha = new Date(response[i].fecha);
+							hora = new Time(response[i].hora);
 							centroAsignado = response[i].nombreCentro;
-							var fechaPrimeraDosis = date.toLocaleString().slice(0, 10);
-							var fechaSegundaDosis = date2.toLocaleString().slice(0, 10);
+							fecha = date.toLocaleString().slice(0, 10);
+							hora = time.toLocaleString().slice(0, 10);
 							let cita = {
 									id : response[i].id,
 									dniPaciente : response[i].dniPaciente,
 									nombreUsuario : response[i].nombrePaciente,
 									centroAsignado: response[i].nombreCentro,
-									fechaPrimeraDosis: date.toLocaleString(),
-									fechaSegundaDosis : date2.toLocaleString(),
-									
-									eliminar : function() {
-										self.eliminarCita(response[i].id);
-									},			
+									fecha: date.toLocaleString(),
+									hora : time.toLocaleString(),	
 							};
-							var fechaActual = new Date().toLocaleString().slice(0, 10);
-							if(fechaPrimeraDosis.toLocaleString().slice(0, 10) != fechaActual && fechaSegundaDosis.toLocaleString().slice(0, 10) != fechaActual){
-								self.citas.push(cita);
-							}
 						}
 					},
 					error : function(response) {
@@ -84,6 +74,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			};
 			$.ajax(data);
 		}
+		
+		
 		
 		logout() {
 			let self = this;
