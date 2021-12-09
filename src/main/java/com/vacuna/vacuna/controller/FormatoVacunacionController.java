@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.vacuna.vacuna.dao.CentroSanitarioDAO;
 import com.vacuna.vacuna.dao.CupoDAO;
 import com.vacuna.vacuna.dao.FormatoVacunacionDAO;
-import com.vacuna.vacuna.exception.FormatoHorasIncorrectasException;
+import com.vacuna.vacuna.exception.ControlHorasVacunacionException;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cupo;
 import com.vacuna.vacuna.model.FormatoVacunacion;
@@ -53,10 +53,10 @@ public class FormatoVacunacionController {
 				formatoVacunacionDao.insert(formatoVacunacion);
 			} else {
 				if (!formatoVacunacion.horasCorrectas())
-					throw new FormatoHorasIncorrectasException();
+					throw new ControlHorasVacunacionException();
 			}
-
-		} catch (FormatoHorasIncorrectasException e) {
+			crearPlantillasCitaVacunacion();
+		} catch (ControlHorasVacunacionException e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 
@@ -74,7 +74,6 @@ public class FormatoVacunacionController {
 		return formatoVacunacion;
 	}
 	
-	@PostMapping("/crearPlantillasCitaVacunacion")
 	public void crearPlantillasCitaVacunacion() {
 		FormatoVacunacion formato = getFormatoVacunacion();
 		List<CentroSanitario> centrosVacunacion = centroVacunacionDao.findAll();
