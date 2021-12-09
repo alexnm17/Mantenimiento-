@@ -100,6 +100,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			}
 
 			getCuposDeFecha() {
+				console.log(localStorage.getItem("emailUsuarioAAdministrar"));
 				let self = this;
 				let data = {
 					url: "cupo/getAllCuposDisponiblesPorFecha/"+this.fechaAConsultar()+'/'+localStorage.getItem("emailUsuarioAAdministrar"),
