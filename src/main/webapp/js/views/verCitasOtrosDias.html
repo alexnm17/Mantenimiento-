@@ -61,7 +61,7 @@
 		<!-- Header -->
 		<div class="w3-container" style="margin-top:20px" id="showcase">
 			<h1 class="w3-jumbo" data-bind="html : centroAsignado" style="text-align:center;"><b></b></h1>
-			<h5 style="text-align:center;">Fecha citas: <input type="date" data-bind="value : fecha" ></h5>
+			<h5 style="text-align:center;">Fecha citas: <input type="date" data-bind="value : fecha, event:{change: VerCitasOtroDia}" ></h5>
 	<!--	<h5 style="text-align:center;">Hora de inicio: <input type="time" data-bind="value : horaInicio" disabled>
 			</h5>
 			<h5 style="text-align:center;">Hora de fin: <input type="time" data-bind="value : horaFin" disabled></h5> -->
@@ -87,9 +87,6 @@
 				<div>
 					<oj-button data-bind="click : verCitasSanitario" chroming="callToAction">Ver citas de hoy
 					</oj-button>
-					<button chroming="callToAction"
-						data-bind="click : BuscarOtroDia">Buscar Citas</button>
-					<!--click : function() buscarOtroDia(fecha)-->
 				</div>
 			</div>
 

@@ -40,32 +40,15 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			})
 		}	
 
-		buscarOtroDia(email, fecha) {
+		VerCitasOtroDia() {
 			let self = this;
 			let data = {
-					url : "cita/getCentroSanitario/"+ email,
+					url : "cita/getCitasOtroDia/"+ self.fecha(),
 					type : "get",
 					contentType : 'application/json',
 					success : function(response) {
-						self.citas([]);
-						var centroAsignado;
-						var date;
-						var time;
-						for (let i=0; i<response.length; i++) {
-							fecha = new Date(response[i].fecha);
-							hora = new Time(response[i].hora);
-							centroAsignado = response[i].nombreCentro;
-							fecha = date.toLocaleString().slice(0, 10);
-							hora = time.toLocaleString().slice(0, 10);
-							let cita = {
-									id : response[i].id,
-									dniPaciente : response[i].dniPaciente,
-									nombreUsuario : response[i].nombrePaciente,
-									centroAsignado: response[i].nombreCentro,
-									fecha: date.toLocaleString(),
-									hora : time.toLocaleString(),	
-							};
-						}
+						console.log(response);
+						
 					},
 					error : function(response) {
 						$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});

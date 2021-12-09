@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
@@ -197,15 +198,11 @@ public class CitaController {
 	public List<Cita> getCitasPorDia(HttpSession session, @PathVariable String fecha) {
 		String email = (String)session.getAttribute("email");		
 		
-
-		List<Cita> citasPrimeraDosis = repositoryCita.findAllByNombreCentroAndFechaPrimeraDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
-		List<Cita> citasSegundaDosis = repositoryCita.findAllByNombreCentroAndFechaSegundaDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
-		citasPrimeraDosis.addAll(citasSegundaDosis);
+		List<Cita> citas = repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
 		
-		//Aunque la lista que devuelve el método se llame citasPrimeraDosis, esta contiene tanto las de la priemra como las de la segunda, era por no cambiar el nombre.
-		return citasPrimeraDosis;
+		return citas;
  	}
-
+	
 	@GetMapping("/getCitasPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
@@ -449,7 +446,11 @@ public class CitaController {
 		JSONObject json = new JSONObject(info);
 		String email = json.getString("email");
 		try {
-			Paciente paciente = repositoryPaciente.findByEmail(email);
+			Optional<Usuario> optPaciente = repositoryUsuario.findById(email);
+			Paciente paciente = null;
+			if(optPaciente.isPresent() && optPaciente.get().getTipoUsuario().equals("Paciente")) {
+				paciente = (Paciente) optPaciente.get();
+			}
 
 			if (paciente == null)
 				throw new UsuarioNoExisteException();
@@ -488,6 +489,18 @@ public class CitaController {
 
 	}
 
+	@GetMapping("/getCitasOtroDia/{fecha}")
+	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable String fecha) {
+
+		String email = session.getAttribute("email").toString();
+		System.out.println("Hemos llegado, estamos a dia"+ fecha + "Coneste Email"+ email);
+		return null;//getCitasPorDia(fecha, email);
+	}
+	
+	public List<Cita> getCitasPorDia(String fecha, String email) {
+		return repositoryCita.findAllByNombreCentroAndFecha( repositoryUsuario.findByEmail(email).getCentroAsignado(),fecha);
+	}
+	
 	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario CentroSanitario) {
 		Cupo cupo = null;
 

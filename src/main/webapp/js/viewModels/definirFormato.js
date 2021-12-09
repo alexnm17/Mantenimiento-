@@ -140,8 +140,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "solicitarCita" });
 			}
 
-			definirCupos() {
-				app.router.go({ path: "definirCupos" });
+			definirFormato() {
+				app.router.go({ path: "definirFormato" });
 			}
 
 			logout() {
@@ -180,7 +180,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				$.ajax(data);
 			}
 
-			definirCuposHandler() {
+			definirFormatoHandler() {
 				var self = this;
 				let info = {
 					horaInicio: this.horaInicio(),
@@ -244,7 +244,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 			connected() {
 				accUtils.announce('Inicio page loaded.');
-				document.title = "Definición de cupos";
+				document.title = "Definición de Formato";
 				this.comprobarRol();
 				this.getFormatoVacunacion();
 				this.getUserConnect();

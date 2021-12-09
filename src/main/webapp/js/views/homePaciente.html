@@ -76,8 +76,8 @@
 				<!-- ko foreach : citas -->
 				<tr>
 					<td data-bind="html : nombreCentro"></td>
-					<td data-bind="html : fechaPrimeraDosis">fecha</td>
-					<td data-bind="html : fechaSegundaDosis">hora</td >
+					<td data-bind="html : fecha"></td>
+					<td data-bind="html : hora"></td >
 					<td><img data-bind="click : function() { $parent.modificarCita(dniPaciente); }" class="iconoImg" src="css/modify.png">
 					
 					</td>

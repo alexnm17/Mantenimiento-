@@ -76,6 +76,10 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "solicitarCita" });
 			}
 			
+			definirFormato() {
+				app.router.go({ path: "definirFormato" });
+			}
+			
 			comprobarRol() {	
 				let self = this;
 				let data = {
