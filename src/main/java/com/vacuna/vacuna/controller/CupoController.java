@@ -33,14 +33,17 @@ public class CupoController {
 	@GetMapping("/getAllCuposDisponiblesPorFecha/{fecha}/{emailPaciente}")
 	public List<Cupo> getAllCuposConHuecoPorFecha(HttpSession session, @PathVariable("fecha") String fecha,
 			@PathVariable("emailPaciente") String emailPaciente) {
-
-		Optional<Usuario> optUsuario = usuarioDao.findById(emailPaciente);
+		System.out.println(fecha);
+		System.out.println(session.getAttribute("userEmail"));
+		String emailUsuario = (String) session.getAttribute("userEmail");
+		Optional<Usuario> optUsuario = usuarioDao.findById(emailUsuario);
 		CentroSanitario centroSanitario = new CentroSanitario();
 		if (optUsuario.isPresent())
 			centroSanitario = repositoryCentro.findByNombre(optUsuario.get().getCentroAsignado());
 		// Aqui abajo me da problemas, no se por que pero devuelve una array vacia.
 		// Revisar.
 		List<Cupo> listaCupos = cupoDao.findAllByCentroSanitarioAndFecha(centroSanitario, fecha);
+		System.out.println("El primero: " +listaCupos.get(0).getFecha());
 		List<Cupo> listaCuposLibres = new ArrayList<>();
 
 		listaCupos.sort((d1, d2) -> d1.getFecha().compareTo(d2.getFecha()));
