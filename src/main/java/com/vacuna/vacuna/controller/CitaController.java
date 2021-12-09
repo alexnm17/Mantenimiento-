@@ -185,6 +185,27 @@ public class CitaController {
 		return repositoryCita.save(cita);
 	}
 
+	@DeleteMapping("/anularCita")
+	public void anularCita(HttpSession session, @RequestBody Map<String, Object> info) {
+		try {
+			JSONObject json = new JSONObject(info);
+			String idCita = json.getString("idCita");
+			Cita cita = repositoryCita.findByIdCita(idCita);
+
+			if (cita.isUsada())
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "La cita que intenta anular ya ha sido utilizada.");
+
+			Cupo cupo = repositoryCita.findAllByCentroVacunacionAndFechaAndHora(cita.getCentroVacunacion(), cita.getFecha(),
+					cita.getHora());
+			cupo.setPersonasRestantes(cupo.getPersonasRestantes() + 1);
+
+			repositoryCita.deleteById(idCita);
+			repositoryCupo.save(cupo);
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+	
 	@GetMapping("/getCitaPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
