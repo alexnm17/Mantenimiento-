@@ -196,7 +196,7 @@ public class CitaController {
 			if (cita.isUsada())
 				throw new ResponseStatusException(HttpStatus.CONFLICT, "La cita que intenta anular ya ha sido utilizada.");
 
-			Cupo cupo = repositoryCita.findAllByCentroVacunacionAndFechaAndHora(cita.getCentroVacunacion(), cita.getFecha(),
+			Cupo cupo = repositoryCupo.findAllByCentroSanitarioAndFechaAndHora(cita.getNombreCentro(), cita.getFecha(),
 					cita.getHora());
 			cupo.setPersonasRestantes(cupo.getPersonasRestantes() + 1);
 
