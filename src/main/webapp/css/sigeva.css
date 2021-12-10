@@ -97,7 +97,11 @@ form {
 .scroll::-webkit-scrollbar {
 	width: 7px;
 }
-
+.contenedor {
+  width:80%;
+  max-width:1000px;
+  margin:0 auto;
+  overflow:hidden;}
 .scroll::-webkit-scrollbar-thumb {
 	background: #ff9d00;
 }
