@@ -13,6 +13,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				self.mostrarModificacionUsuario = ko.observable(1);
 
 				self.dni = localStorage.getItem('dniUsuarioAAdministrar')
+				self.email = localStorage.getItem('emailUsuarioAAdministrar')
+
 
 				self.citas = ko.observableArray([]);
 				self.nombreUsuario = ko.observable("");
@@ -28,8 +30,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 				self.mensaje = ko.observable(2);
 				self.mostrarSolicitarCita = ko.observable(1);
-
-
 
 				// Header Config
 				self.headerConfig = ko.observable({
@@ -55,11 +55,9 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "get",
 					contentType: 'application/json',
 					success: function(response) {
-						console.log(response)
+						console.log(response);
+						self.citas(response);
 
-						for (let cita of response) {
-							self.citas.push(cita);
-						}
 					},
 					error: function(response) {
 						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
@@ -69,14 +67,47 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				$.ajax(data);
 			}
 
+			solicitarCita() {
+				let self = this;
+				let info = {
+					email: self.email,
+				};
+
+				let data = {
+					data: JSON.stringify(info),
+					url: "cita/solicitarCita",
+					type: "post",
+					contentType: 'application/json',
+					success: function(response) {
+						$.confirm({
+							title: 'Confirmado',
+							content: 'Cita Creada',
+							type: 'green',
+							typeAnimated: true,
+							buttons: {
+								Cerrar: function() {
+									location.reload();
+								}
+							}
+						});
+						this.getCitas();
+					},
+					error: function(response) {
+						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
+
+					}
+				};
+				$.ajax(data);
+			}
+
+
 			eliminarCita(id) {
 				let self = this;
 				let data = {
-					url: "cita/eliminarCita/" + id,
+					url: "cita/anularCita/" + id,
 					type: "delete",
 					contentType: 'application/json',
 					success: function(response) {
-
 						$.confirm({
 							title: 'Confirmado',
 							content: 'Cita eliminada',
@@ -91,7 +122,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					},
 					error: function(response) {
 						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
-
 					}
 				};
 				$.confirm({
@@ -107,36 +137,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				});
 			}
 
-			modificarCita(id) {
-				let self = this;
-
-				let data = {
-					url: "cita/modificarCita/" + id,
-					type: "put",
-					contentType: 'application/json',
-					success: function(response) {
-						self.fechaPrimeraDosis(response.fechaPrimeraDosis);
-						self.fechaSegundaDosis(response.fechaSegundaDosis);
-						self.centroAsignado(response.nombreCentro);
-
-						$.confirm({
-							title: 'Confirmado',
-							content: 'Cita creada',
-							type: 'green',
-							typeAnimated: true,
-							buttons: {
-								Cerrar: function() {
-								}
-							}
-						});
-						self.getCitas();
-					},
-					error: function(response) {
-						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
-
-					}
-				};
-				$.ajax(data);
+			modificarCita() {
+				app.router.go({ path: "modificarCita" });
 			}
 
 			getUserConnect() {
