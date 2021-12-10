@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -184,6 +185,28 @@ public class CitaController {
 		return repositoryCita.save(cita);
 	}
 
+	@DeleteMapping("/anularCita")
+	public void anularCita(HttpSession session, @RequestBody Map<String, Object> info) {
+		try {
+			JSONObject json = new JSONObject(info);
+			String idCita = json.getString("idCita");
+			Optional<Cita> opt_cita = repositoryCita.findById(idCita);
+			Cita cita = opt_cita.get();
+
+			if (cita.isUsada())
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "La cita que intenta anular ya ha sido utilizada.");
+
+			Cupo cupo = repositoryCupo.findAllByCentroSanitarioAndFechaAndHora(cita.getNombreCentro(), cita.getFecha(),
+					cita.getHora());
+			cupo.setPersonasRestantes(cupo.getPersonasRestantes() + 1);
+
+			repositoryCita.deleteById(idCita);
+			repositoryCupo.save(cupo);
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+	
 	@GetMapping("/getCitaPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
@@ -227,80 +250,8 @@ public class CitaController {
 	}
 
 
-	@PostMapping("/modificarCita")
-	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) {
-		try {
-			JSONObject json = new JSONObject(datosCita);
-			String idCita = json.getString("idCita");
-			String idCupo = json.getString("idCupo");
-			String emailUsuario = (String) session.getAttribute("emailUsuario");
-			String dniPaciente = repositoryUsuario.findByEmail(emailUsuario).getDni();
-			
-			Usuario usuario = repositoryUsuario.findByEmail(emailUsuario);
-			Optional<Cita> citaaModificar = repositoryCita.findById(idCita);
-			Cita citaModificar = citaaModificar.get();
-			Optional<Cupo> optCupoElegido = repositoryCupo.findById(idCupo);
-			Cupo cupoElegido = new Cupo();
-
-			if (optCupoElegido.isPresent())
-				cupoElegido = optCupoElegido.get();
-
-			List<Cita> listaCitas = repositoryCita.findAllByDniPaciente(dniPaciente);
-			listaCitas.sort(Comparator.comparing(Cita::getFecha));
-			int citasAsignadas = listaCitas.size();
-
-			if (citasAsignadas < 1)
-				throw new ResponseStatusException (HttpStatus.NOT_FOUND,
-						"No se puede modificar citas puesto que no dispone de ninguna cita asignada");
-
-			if (cupoElegido.getPersonasRestantes() < 1)
-				throw new ResponseStatusException (HttpStatus.FORBIDDEN,
-						"No hay hueco para cita el dia " + cupoElegido.getFecha() + " a las " + cupoElegido.getHora());
-
-			if (citaModificar.isUsada())
-				throw new ResponseStatusException (HttpStatus.NOT_FOUND,
-						"No se puede modificar su cita puesto que ya está vacunado");
-
-			if(listaCitas.size()==2) {
-				int indiceCita = -1;
-				if(citaModificar.getId().equalsIgnoreCase(listaCitas.get(0).getId()))
-					indiceCita = 0;
-				else if(citaModificar.getId().equalsIgnoreCase(listaCitas.get(1).getId()))
-					indiceCita = 1;
-
-				switch (indiceCita) {
-				case 0:
-					if (LocalDate.parse(cupoElegido.getFecha()).isAfter(LocalDate.parse(listaCitas.get(1).getFecha()))
-							|| LocalDate.parse(cupoElegido.getFecha())
-							.isEqual(LocalDate.parse(listaCitas.get(1).getFecha())))
-						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
-								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
-					break;
-				case 1:
-					if (LocalDate.parse(cupoElegido.getFecha())
-							.isBefore(LocalDate.parse(listaCitas.get(0).getFecha()).plusDays(21)))
-						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
-								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
-					break;
-				default:
-					break;
-				}
-			}
-				citaModificar.setFecha(cupoElegido.getFecha());
-				citaModificar.setHora(cupoElegido.getHora());
-				repositoryCita.save(citaModificar);
-
-				cupoElegido.setPersonasRestantes(cupoElegido.getPersonasRestantes() - 1);
-				repositoryCupo.save(cupoElegido);
-
-			} catch (ResponseStatusException  e) {
-				if(e.getStatus() == HttpStatus.FORBIDDEN) {
-					throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
-				}else if(e.getStatus() == HttpStatus.NOT_FOUND) {
-					throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-				}		}
-		}
-
+	
+	
 		@Transactional
 		@PutMapping("/definirFormatoVacunacion")
 		/***
@@ -466,6 +417,80 @@ public class CitaController {
 	public List<Cita> getCitasPorDia(String fecha, String email) {
 		return repositoryCita.findAllByNombreCentroAndFecha( repositoryUsuario.findByEmail(email).getCentroAsignado(),fecha);
 	}
+	
+	@PostMapping("/modificarCita")
+	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) {
+		try {
+			JSONObject json = new JSONObject(datosCita);
+			String idCita = json.getString("idCita");
+			String idCupo = json.getString("idCupo");
+			String emailUsuario = (String) session.getAttribute("emailUsuario");
+			String dniPaciente = repositoryUsuario.findByEmail(emailUsuario).getDni();
+			
+			Usuario usuario = repositoryUsuario.findByEmail(emailUsuario);
+			Optional<Cita> citaaModificar = repositoryCita.findById(idCita);
+			Cita citaModificar = citaaModificar.get();
+			Optional<Cupo> optCupoElegido = repositoryCupo.findById(idCupo);
+			Cupo cupoElegido = new Cupo();
+
+			if (optCupoElegido.isPresent())
+				cupoElegido = optCupoElegido.get();
+
+			List<Cita> listaCitas = repositoryCita.findAllByDniPaciente(dniPaciente);
+			listaCitas.sort(Comparator.comparing(Cita::getFecha));
+			int citasAsignadas = listaCitas.size();
+
+			if (citasAsignadas < 1)
+				throw new ResponseStatusException (HttpStatus.NOT_FOUND,
+						"No se puede modificar citas puesto que no dispone de ninguna cita asignada");
+
+			if (cupoElegido.getPersonasRestantes() < 1)
+				throw new ResponseStatusException (HttpStatus.FORBIDDEN,
+						"No hay hueco para cita el dia " + cupoElegido.getFecha() + " a las " + cupoElegido.getHora());
+
+			if (citaModificar.isUsada())
+				throw new ResponseStatusException (HttpStatus.NOT_FOUND,
+						"No se puede modificar su cita puesto que ya está vacunado");
+
+			if(listaCitas.size()==2) {
+				int indiceCita = -1;
+				if(citaModificar.getId().equalsIgnoreCase(listaCitas.get(0).getId()))
+					indiceCita = 0;
+				else if(citaModificar.getId().equalsIgnoreCase(listaCitas.get(1).getId()))
+					indiceCita = 1;
+
+				switch (indiceCita) {
+				case 0:
+					if (LocalDate.parse(cupoElegido.getFecha()).isAfter(LocalDate.parse(listaCitas.get(1).getFecha()))
+							|| LocalDate.parse(cupoElegido.getFecha())
+							.isEqual(LocalDate.parse(listaCitas.get(1).getFecha())))
+						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+					break;
+				case 1:
+					if (LocalDate.parse(cupoElegido.getFecha())
+							.isBefore(LocalDate.parse(listaCitas.get(0).getFecha()).plusDays(21)))
+						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+					break;
+				default:
+					break;
+				}
+			}
+				citaModificar.setFecha(cupoElegido.getFecha());
+				citaModificar.setHora(cupoElegido.getHora());
+				repositoryCita.save(citaModificar);
+
+				cupoElegido.setPersonasRestantes(cupoElegido.getPersonasRestantes() - 1);
+				repositoryCupo.save(cupoElegido);
+
+			} catch (ResponseStatusException  e) {
+				if(e.getStatus() == HttpStatus.FORBIDDEN) {
+					throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+				}else if(e.getStatus() == HttpStatus.NOT_FOUND) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+				}		}
+		}
 	
 	
 	}
