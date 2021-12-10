@@ -47,12 +47,12 @@
 				<a data-bind="click : crearCentros" class="w3-bar-item w3-button w3-hover-white">Crear Centro</a>
 				<a data-bind="click : gestionCentros" class="w3-bar-item w3-button w3-hover-white">Ver centros</a>
 			</div>
-			<!-- Cupos -->
-			<button class="dropdown-btn w3-bar-item w3-button w3-hover-white">Cupos
+			<!-- Formato -->
+			<button class="dropdown-btn w3-bar-item w3-button w3-hover-white">Formato Vacunacion
 				<i class="fa fa-caret-down"></i>
 			</button>
 			<div class="dropdown-container">
-				<a data-bind="click : definirCupos" class="w3-bar-item w3-button w3-hover-white">Definir cupos</a>
+				<a data-bind="click : definirFormato" class="w3-bar-item w3-button w3-hover-white">Definir Formato</a>
 			</div>
 		</div>
 	</nav>
@@ -102,7 +102,7 @@
 			<label for="fPersonasPorFranja">Personas por franja:</label>
 			<input type="text" id="fPersonasPorFranja" name="fPersonasPorFranja" placeholder="10"
 				data-bind="value : personasAVacunar"><br><br>
-			<button data-bind="click : definirCuposHandler">Definir formato vacunación</button>
+			<button data-bind="click : definirFormatoHandler">Definir formato vacunación</button>
 		</div>
 		<!-- End page content -->
 	</div>

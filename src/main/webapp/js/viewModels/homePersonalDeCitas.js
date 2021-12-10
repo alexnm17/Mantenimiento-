@@ -13,7 +13,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				self.tipoUsuario = ko.observable("");
 				self.password = ko.observable("");
 				self.centroAsignado = ko.observable("");
-				self.dosisAdministradas = ko.observable("");
 				self.localidad = ko.observable("");
 				self.provincia = ko.observable("");
 
@@ -47,9 +46,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			irHomePersonalDeCitas() {
 				app.router.go({ path: "homePersonalDeCitas" });
 			}
-			
-			administrarCitas(dni) {
+
+			administrarCitas(dni, email) {
 				localStorage.setItem('dniUsuarioAAdministrar', dni)
+				localStorage.setItem('emailUsuarioAAdministrar', email)
 				app.router.go({ path: "administrarCitas" });
 			}
 
@@ -73,7 +73,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 								dni: usuario.dni,
 								tipoUsuario: usuario.tipoUsuario,
 								centroAsignado: usuario.centroAsignado,
-								dosisAdministradas: usuario.dosisAdministradas,
 								eliminar: function() {
 									self.eliminarUsuario(usuario.email);
 								},
