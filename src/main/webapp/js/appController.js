@@ -51,8 +51,7 @@ define(['knockout', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojkno
 				{ path: 'eliminarCita', detail: { label: 'Gestion de Centros' } },
 				{ path: 'homePersonalDeCitas', detail: { label: 'Inicio' } },
 				{ path: 'administrarCitas', detail: { label: 'Administrar Citas' } },
-				{ path: 'definirCupos', detail: { label: 'Definir Cupos' } },
-
+				{ path: 'definirFormato', detail: { label: 'Definir Formato' } },
 
 			];
 			// Router setup

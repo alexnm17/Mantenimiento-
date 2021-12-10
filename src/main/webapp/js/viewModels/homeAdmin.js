@@ -144,8 +144,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "solicitarCita" });
 			}
 
-			definirCupos() {
-				app.router.go({ path: "definirCupos" });
+			definirFormato() {
+				app.router.go({ path: "definirFormato" });
 			}
 
 

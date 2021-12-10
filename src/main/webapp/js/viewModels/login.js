@@ -40,7 +40,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				type : "post",
 				contentType : 'application/json',
 				success : function(response) {
-					
+					localStorage.setItem("emailUsuario",self.email());
 					
 					if(response.tipoUsuario=="Paciente"){
 						app.user = response;
