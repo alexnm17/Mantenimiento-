@@ -426,10 +426,8 @@ public class CitaController {
 			JSONObject json = new JSONObject(datosCita);
 			String idCita = json.getString("idCita");
 			String idCupo = json.getString("idCupo");
-			String emailUsuario = (String) session.getAttribute("emailUsuario");
-			String dniPaciente = repositoryUsuario.findByEmail(emailUsuario).getDni();
+			String dniPaciente = json.getString("dniPaciente");
 
-			Usuario usuario = repositoryUsuario.findByEmail(emailUsuario);
 			Optional<Cita> citaaModificar = repositoryCita.findById(idCita);
 			Cita citaModificar = citaaModificar.get();
 			Optional<Cupo> optCupoElegido = repositoryCupo.findById(idCupo);

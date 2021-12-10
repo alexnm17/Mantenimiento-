@@ -103,7 +103,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				console.log(localStorage.getItem("emailUsuarioAAdministrar"));
 				let self = this;
 				let data = {
-					url: "cupo/getAllCuposDisponiblesPorFecha/"+this.fechaAConsultar()+'/'+localStorage.getItem("emailUsuarioAAdministrar"),
+					url: "cupo/getAllCuposDisponiblesPorFecha/" + this.fechaAConsultar() + '/' + localStorage.getItem("emailUsuarioAAdministrar"),
 					type: "get",
 					contentType: 'application/json',
 					success: function(response) {
@@ -114,6 +114,40 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 						alert("cupos no obtenidos");
 						self.error(response.responseJSON.errorMessage);
 
+					}
+				};
+				$.ajax(data);
+			}
+
+			seleccionarCupo(idCupo) {
+				var self = this;
+
+				let info = {
+					idCita : localStorage.getItem("idCitaAModificar"),
+					idCupo : idCupo,
+					dniPaciente : localStorage.getItem("dniUsuarioAAdministrar")
+				};
+				let data = {
+					data: JSON.stringify(info),
+					url: "cita/modificarCita",
+					type: "post",
+					contentType: 'application/json',
+					success: function() {
+						app.router.go({ path: "administrarCitas" });
+						$.confirm({
+							title: 'Confirmado',
+							content: 'Cita modificada',
+							type: 'green',
+							typeAnimated: true,
+							buttons: {
+								Cerrar: function() {
+									//Boton para cerrar el popup de confirmación
+								}
+							}
+						});
+					},
+					error: function(response) {
+						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
 					}
 				};
 				$.ajax(data);
