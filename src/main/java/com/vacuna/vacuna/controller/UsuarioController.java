@@ -283,7 +283,6 @@ public class UsuarioController {
 		
 		
 		Usuario u =  repository.findByEmail(email);
-		
 		if(!formValido(nombre, email, centroAsignado, password)) {
 			throw new DatosIncompletosException();
 		}

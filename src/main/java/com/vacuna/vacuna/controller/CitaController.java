@@ -495,7 +495,7 @@ public class CitaController {
 	}
 	
 	public List<Cita> getCitasPorDia(String fecha, String email) {
-		return repositoryCita.findAllByNombreCentroAndFecha( repositoryUsuario.findByEmail(email).getCentroAsignado(),fecha);
+		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByEmail(email).getCentroAsignado(),fecha);
 	}
 	
 	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario CentroSanitario) {
