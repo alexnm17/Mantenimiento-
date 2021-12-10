@@ -94,7 +94,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 						if (response != null) {
 							self.hayDatos(true);
 							self.noHayDatos(false);
-							
+
 							self.horaInicio(response.horaInicioVacunacion);
 							self.horaFin(response.horaFinVacunacion);
 							self.duracionFranja(response.duracionFranjaVacunacion);
@@ -215,8 +215,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				};
 				$.ajax(data);
 			}
-			
-			crearCupos(){
+
+			crearCupos() {
 				let data = {
 					url: "formato/crearPlantillasCitaVacunacion",
 					type: "post",

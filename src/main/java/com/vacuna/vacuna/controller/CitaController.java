@@ -489,12 +489,9 @@ public class CitaController {
 
 	}
 
-	@GetMapping("/getCitasOtroDia/{fecha}")
-	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable String fecha) {
-
-		String email = session.getAttribute("email").toString();
-		System.out.println("Hemos llegado, estamos a dia"+ fecha + "Coneste Email"+ email);
-		return null;//getCitasPorDia(fecha, email);
+	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
+	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email, @PathVariable("fecha") String fecha) {
+		return getCitasPorDia(fecha, email);
 	}
 	
 	public List<Cita> getCitasPorDia(String fecha, String email) {

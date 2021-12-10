@@ -43,11 +43,12 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		VerCitasOtroDia() {
 			let self = this;
 			let data = {
-					url : "cita/getCitasOtroDia/"+ self.fecha(),
+					url : "cita/getCitasOtroDia/"+localStorage.getItem("emailUsuario")+"/"+ self.fecha(),
 					type : "get",
 					contentType : 'application/json',
 					success : function(response) {
-						console.log(response);
+						self.citas(response);
+						console.log(self.citas());
 						
 					},
 					error : function(response) {

@@ -266,7 +266,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.idc = id;
 				app.cita = this;
 				app.router.go({ path: "eliminarCita" });
-				self.getCitaPaciente();
 			}
 
 			connected() {

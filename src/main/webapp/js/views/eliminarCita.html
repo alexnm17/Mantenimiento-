@@ -36,24 +36,21 @@
 
 
 		</header>
-		<a href="javascript:void(0)" onclick="w3_close()"
-			class="w3-button w3-hide-large w3-display-topleft"
+		<a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft"
 			style="width: 100%; font-size: 15px">Close Menu</a>
 
 
 	</nav>
 
 	<!-- Top menu on small screens -->
-	<header
-		class="w3-container w3-top w3-hide-large w3-indigo w3-xlarge w3-padding">
-		<a href="javascript:void(0)"
-			class="w3-button w3-indigo w3-margin-right" onclick="w3_open()">☰</a>
+	<header class="w3-container w3-top w3-hide-large w3-indigo w3-xlarge w3-padding">
+		<a href="javascript:void(0)" class="w3-button w3-indigo w3-margin-right" onclick="w3_open()">☰</a>
 
 	</header>
 
 	<!-- Overlay effect when opening sidebar on small screens -->
-	<div class="w3-overlay w3-hide-large" onclick="w3_close()"
-		style="cursor: pointer" title="close side menu" id="myOverlay"></div>
+	<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor: pointer" title="close side menu"
+		id="myOverlay"></div>
 
 	<!-- !PAGE CONTENT! -->
 	<div class="w3-main" style="margin-left: 100px; margin-right: 100px">
@@ -61,36 +58,27 @@
 		<!-- Header -->
 		<div class="w3-container" style="margin-top: 20px" id="showcase">
 
-
 			<h1 class="w3-jumbo" style="text-align: center;">
 				<b>Eliminar cita</b>
 			</h1>
 			<div style="text-align: center;">
 
-				<div  data-bind="visible : botonFecha1()==1">
-					<label>Fecha 1º Dosis</label> <input type="text"
-						data-bind="value : fechaPrimeraDosis" disabled>
+				<div data-bind="visible : botonFecha1()==1">
+					<label>Fecha Cita</label> <input type="text" data-bind="value : fecha" disabled>
 					<div style="margin-top: 20px">
-						<button chroming="callToAction"
-							style="background-color: #f44336; border-radius: 4px; color: white; font-size: 20px;"
-							data-bind="click : eliminarPrimeraCita" style="margin-top:3px;">Eliminar Primera
-							cita</button>
-					</div>
-				</div>
-				<div style="margin-top: 10px">
-					<label>Fecha 2º Dosis</label> <input type="text"
-						data-bind="value : fechaSegundaDosis" disabled>
 
-					<div style="margin-top: 20px">
-						<button chroming="callToAction"
-							style="background-color: #f44336; border-radius: 4px; color: white; font-size: 20px;"
-							data-bind="click : eliminarSegundaCita" style="margin-top:3px;">Eliminar Segunda
-							cita</button> 
+						<div style="margin-top: 10px">
+							<label>Hora Cita</label> <input type="text" data-bind="value : hora" disabled>
+
+							<button chroming="callToAction"
+								style="background-color: #f44336; border-radius: 4px; color: white; font-size: 20px;"
+								data-bind="click : eliminarCita" style="margin-top:3px;">Eliminar cita</button>
+						</div>
+
 					</div>
 				</div>
+				<!-- End page content -->
 			</div>
-			<!-- End page content -->
-		</div>
 </body>
 
 </html>
