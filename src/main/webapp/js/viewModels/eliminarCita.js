@@ -40,8 +40,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			//self.fechaPrimeraDosis = ko.observable(final);
 			//self.fechaSegundaDosis = ko.observable(final2);
 			
-			self.fechaPrimeraDosis = ko.observable(final3);
-			self.fechaSegundaDosis = ko.observable(final4);
+			self.fecha = ko.observable(final3);
+			self.hora = ko.observable(final4);
 			
 			self.dniPaciente = ko.observable();
 
@@ -63,82 +63,14 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			})
 		}	
 
-//		modificarCita() {
-//		var self = this;
 
-//		let info = {
-//		id : app.cita.id,
-//		dniPaciente : app.cita.dniPaciente,
-//		fechaPrimeraDosis: this.fechaPrimeraDosis(),
-//		fechaSegundaDosis: this.fechaSegundaDosis(),
-//		centrosSanitarios : app.cita.centroAsignado,
-//		};
-//		let data = {
-//		data : JSON.stringify(info),
-//		url : "cita/modificarCita/" + app.cita.id,
-//		type : "put",
-//		contentType : 'application/json',
-//		success : function(response) {
-//		app.router.go({ path: "homePaciente" });
-//		$.confirm({
-//		title: 'Confirmado',
-//		content: 'Cita modificada',
-//		type: 'green',
-//		typeAnimated: true,
-//		buttons: {
-//		Cerrar: function () {
-//		}
-//		}
-//		});
-//		},
-//		error: function(response) {
-//		$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
-//		}
-//		};
-//		$.ajax(data);
-//		}
-
-		eliminarPrimeraCita() {
+		eliminarCita() {
 			var self = this;
 
 			let info = {
 					id : app.cita.id,
 					dniPaciente : app.cita.dniPaciente,
-					fechaPrimeraDosis: app.cita.fechaSegundaDosis,
-					centrosSanitarios : app.cita.centroAsignado,
-			};
-			let data = {
-					data : JSON.stringify(info),
-					url : "cita/eliminarCita/" + app.cita.id,
-					type : "put",
-					contentType : 'application/json',
-					success : function(response) {
-						app.router.go({ path: "homePaciente" });
-						$.confirm({
-							title: 'Confirmado',
-							content: 'Cita eliminada',
-							type: 'green',
-							typeAnimated: true,
-							buttons: {
-								Cerrar: function () {
-								}
-							}
-						});
-					},
-					error: function(response) {
-						$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
-					}
-			};
-			$.ajax(data);
-		}
-
-		eliminarSegundaCita() {
-			var self = this;
-
-			let info = {
-					id : app.cita.id,
-					dniPaciente : app.cita.dniPaciente,
-					fechaPrimeraDosis: app.cita.fechaPrimeraDosis,
+					fecha: app.cita.fecha,
 					centrosSanitarios : app.cita.centroAsignado,
 			};
 			let data = {
