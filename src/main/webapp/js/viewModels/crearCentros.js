@@ -85,6 +85,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				app.router.go({ path: "solicitarCita" });
 			}
 
+			definirFormato() {
+				app.router.go({ path: "definirFormato" });
+			}
+
 			getFormatoVacunacion() {
 				let self = this;
 				let data = {
