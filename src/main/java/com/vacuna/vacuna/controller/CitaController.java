@@ -234,16 +234,18 @@ public class CitaController {
 			String idCita = json.getString("idCita");
 			String idCupo = json.getString("idCupo");
 			String emailUsuario = (String) session.getAttribute("emailUsuario");
-
+			String dniPaciente = repositoryUsuario.findByEmail(emailUsuario).getDni();
+			
 			Usuario usuario = repositoryUsuario.findByEmail(emailUsuario);
-			Cita citaModificar = repositoryCita.findByIdCita(idCita);
+			Optional<Cita> citaaModificar = repositoryCita.findById(idCita);
+			Cita citaModificar = citaaModificar.get();
 			Optional<Cupo> optCupoElegido = repositoryCupo.findById(idCupo);
 			Cupo cupoElegido = new Cupo();
 
 			if (optCupoElegido.isPresent())
 				cupoElegido = optCupoElegido.get();
 
-			List<Cita> listaCitas = repositoryCita.findAllByUsuarioEmail(usuario.getEmail());
+			List<Cita> listaCitas = repositoryCita.findAllByDniPaciente(dniPaciente);
 			listaCitas.sort(Comparator.comparing(Cita::getFecha));
 			int citasAsignadas = listaCitas.size();
 
