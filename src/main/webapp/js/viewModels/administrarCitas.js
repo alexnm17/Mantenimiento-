@@ -137,7 +137,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				});
 			}
 
-			modificarCita() {
+			modificarCita(idCita) {
+				localStorage.setItem("idCitaAModificar",idCita)
 				app.router.go({ path: "modificarCita" });
 			}
 

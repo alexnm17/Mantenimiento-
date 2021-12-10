@@ -71,7 +71,7 @@
 				<tr>
 					<td data-bind="html : fecha"></td>
 					<td data-bind="html : hora"></td>
-					<td><button>Seleccionar</button><td>
+					<td><button data-bind="click : function() { $parent.seleccionarCupo(idCupo); }">Seleccionar</button ><td>
 				</tr>
 				<!-- /ko -->
 			</table>
