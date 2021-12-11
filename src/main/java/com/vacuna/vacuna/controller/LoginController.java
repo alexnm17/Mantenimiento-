@@ -44,7 +44,7 @@ public class LoginController {
 	@Autowired 
 	private UsuarioDAO userRepository;
 	 
-	private String userEmail = "userEmail";   
+	private String userEmail = "emailUsuario";   
 	private String pacient= "Paciente";  
 	private String denegado = "denegado";  
 	private String aprobado = "aprobado";  
@@ -153,7 +153,28 @@ public class LoginController {
 		try {
 			String email = (String) request.getSession().getAttribute(userEmail);
 			Usuario u = userRepository.findByEmail(email);
+			System.out.println(u.getTipoUsuario());
 			if(u == null || !u.getTipoUsuario().equalsIgnoreCase("Personal de Citas")) {
+				return denegado;
+			}
+		} catch (Exception e) {
+			throw new FalloRolUsuarioException();
+		}
+		return aprobado;
+	}
+	
+	@GetMapping("/comprobarRolPersonalDeCitasAndPaciente")
+	/***
+	 * Comprobamos que el usuario que inicia sesion es personal de citas
+	 * @param request
+	 * @return rol personalDeCitas
+	 * @throws FalloRolUsuarioException
+	 */
+	public @ResponseBody String comprobarRolPersonalDeCitasAndPaciente(HttpServletRequest request) throws FalloRolUsuarioException {
+		try {
+			String email = (String) request.getSession().getAttribute(userEmail);
+			Usuario u = userRepository.findByEmail(email);
+			if(u == null || (!u.getTipoUsuario().equalsIgnoreCase("Personal de Citas") && !u.getTipoUsuario().equalsIgnoreCase(pacient))) {
 				return denegado;
 			}
 		} catch (Exception e) {

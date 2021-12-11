@@ -133,10 +133,30 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			};
 			$.ajax(data);
 		}
+		
+		comprobarRol() {	
+				let self = this;
+				let data = {
+					url: "login/comprobarRolPersonalDeCitasAndPaciente",
+					type: "get",
+					contentType: 'application/json',
+					success: function(response) {
+						if(response=="denegado"){
+							app.router.go( { path : "login"} );
+						}
+					},
+					error: function(response) {
+						$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
+						
+					}
+				};
+				$.ajax(data);
+		}
 
 		connected() {
 			accUtils.announce('Inicio page loaded.');
 			document.title = "Modificar cita";
+			this.comprobarRol();
 			this.getUserConnect();
 		};
 
