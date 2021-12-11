@@ -6,8 +6,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		constructor() {
 			var self = this;
 			
-			self.email = ko.observable("crisAdministrador@sigeva.com");
-			self.password = ko.observable("Hola1236=");
+			self.email = ko.observable("jaime@sigeva.com");
+			self.password = ko.observable("Jj=123456");
 			self.dni = ko.observable("");		
 			
 			self.message = ko.observable();
@@ -50,6 +50,11 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}else if(response.tipoUsuario=="Sanitario"){
 						app.navDataMenu.push({ path: 'home', detail : { label : 'Home'} });  
 						app.router.go( { path : "homeSanitario"} );	
+					
+					}else if(response.tipoUsuario=="Personal de Citas"){
+						app.navDataMenu.push({ path: 'home', detail : { label : 'Home'} });  
+						app.router.go( { path : "homePersonalDeCitas"} );	
+						
 					}else{
 						app.navDataMenu.push({ path: 'home', detail : { label : 'Home'} });  
 						app.router.go( { path : "homeAdmin"} );	

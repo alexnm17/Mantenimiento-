@@ -71,23 +71,39 @@
 	<div class="w3-main" style="margin-left:340px;margin-right:40px">
 
 		<!-- Header -->
-		<div class="w3-container" style="margin-top:80px; text-align:center;" id="showcase">
-
-			<h1 class="w3-jumbo"><b>Bienvenido</b></h1><b>
-				<h1 class="w3-jumbo" data-bind="html : nombre"></h1>
-			</b>
-			<h1 class="w3-jumbo"><b>al sistema de gestión de vacunas</b></h1>
-			<h1 class="w3-jumbo"><b>SIGEVA</b></h1>
-			<h1 class="w3-xxxlarge w3-text-black" style="margin-top:80px;"><b>Hoy es <span
-						data-bind="html : fecha"></span></b></h1>
-
-			<div id="box">
-				<div id="box-date"></div>
-				<div id="box-time"></div>
-			</div>
+		<h1 class="w3-jumbo"><b>Gestión de cupos</b></h1>
+		<div data-bind="visible: hayDatos">
+			<h2>Formato actual:</h2>
+			<table class="w3-table-all w3-centered">
+				<tr class="w3-indigo">
+					<th>Hora Inicio</th>
+					<th>Hora Fin</th>
+					<th>Duración de Franja</th>
+					<th>Personas por franja</th>
+				</tr>
+				<tr>
+					<td data-bind="html : horaInicio"></td>
+					<td data-bind="html : horaFin"></td>
+					<td data-bind="html : duracionFranja"></td>
+					<td data-bind="html : personasAVacunar"></td>
+				</tr>
+			</table>
+		</div >
+		<div data-bind="visible: noHayDatos">
+			<h3>Defina el formato de vacunación:</h3>
+			<label for="fhoraInicio">Hora de Inicio:</label>
+			<input type="text" id="fhoraInicio" name="fhoraInicio" placeholder="08:00"
+				data-bind="value : horaInicio"><br><br>
+			<label for="fhoraFin">Hora de fin:</label>
+			<input type="text" id="fhoraFin" name="fhoraFin" placeholder="10:00" data-bind="value : horaFin"><br><br>
+			<label for="fDuracion">Duración (en minutos):</label>
+			<input type="text" id="fDuracion" name="fDuracion" placeholder="30"
+				data-bind="value : duracionFranja"><br><br>
+			<label for="fPersonasPorFranja">Personas por franja:</label>
+			<input type="text" id="fPersonasPorFranja" name="fPersonasPorFranja" placeholder="10"
+				data-bind="value : personasAVacunar"><br><br>
+			<button data-bind="click : definirCuposHandler">Definir formato vacunación</button>
 		</div>
-
-
 		<!-- End page content -->
 	</div>
 
