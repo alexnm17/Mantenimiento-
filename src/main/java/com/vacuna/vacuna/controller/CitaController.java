@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,7 +80,7 @@ public class CitaController {
 
 	@Autowired
 	private CupoDAO repositoryCupo;
-	
+
 	@Autowired
 	private PacienteDAO repositoryPaciente;
 
@@ -116,17 +118,6 @@ public class CitaController {
 		}
 	}
 
-	@Transactional
-	@DeleteMapping("/eliminarCitasPaciente/{dni}")
-	/***
-	 * Eliminamos las dos citas, la de la primera dosis y la de la segunda
-	 * 
-	 * @param id
-	 * @return null
-	 */
-	public void eliminarCitasPaciente(@PathVariable String dni) {
-		repositoryCita.deleteAllByDniPaciente(dni);
-	}
 
 	@Transactional
 	@DeleteMapping("/eliminarCita/{id}")
@@ -147,6 +138,34 @@ public class CitaController {
 		
 	}
 
+	@DeleteMapping("/anularCita/{id}")
+	public void anularCita(HttpSession session, @PathVariable String id) {
+		try {
+			Optional<Cita> optCita = repositoryCita.findById(id);
+			Cita cita = null;
+			if (optCita.isPresent()) {
+				cita = optCita.get();
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe la cita que intenta anular.");
+			}
+
+			if (cita.isUsada())
+				throw new ResponseStatusException(HttpStatus.CONFLICT,
+						"La cita que intenta anular ya ha sido utilizada.");
+
+			CentroSanitario centroSanitario = repositoryCentro.findByNombre(cita.getNombreCentro());
+
+			Cupo cupo = repositoryCupo.findAllByCentroSanitarioAndFechaAndHora(centroSanitario, cita.getFecha(),
+					cita.getHora());
+			cupo.setPersonasRestantes(cupo.getPersonasRestantes() + 1);
+
+			repositoryCita.deleteById(id);
+			repositoryCupo.save(cupo);
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
 	@GetMapping("/getCitaPaciente/{dni}")
 	/***
 	 * Obtenemos la cita de un paciente
@@ -160,16 +179,13 @@ public class CitaController {
 
 	@GetMapping("/getCitaPorDia/{fecha}")
 	public List<Cita> getCitasPorDia(HttpSession session, @PathVariable String fecha) {
-		String email = (String)session.getAttribute("email");		
-		
+		String email = (String) session.getAttribute("email");
 
-		List<Cita> citasPrimeraDosis = repositoryCita.findAllByNombreCentroAndFechaPrimeraDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
-		List<Cita> citasSegundaDosis = repositoryCita.findAllByNombreCentroAndFechaSegundaDosis(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
-		citasPrimeraDosis.addAll(citasSegundaDosis);
-		
-		//Aunque la lista que devuelve el método se llame citasPrimeraDosis, esta contiene tanto las de la priemra como las de la segunda, era por no cambiar el nombre.
-		return citasPrimeraDosis;
- 	}
+		List<Cita> citas = repositoryCita
+				.findAllByNombreCentroAndFecha(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
+
+		return citas;
+	}
 
 	@GetMapping("/getCitasPaciente/{dni}")
 	/***
@@ -182,7 +198,6 @@ public class CitaController {
 		return repositoryCita.findAllByDniPaciente(dni);
 	}
 
-
 	@GetMapping("/")
 	/***
 	 * Obtenemos todas las citas
@@ -191,63 +206,6 @@ public class CitaController {
 	 */
 	public List<Cita> readAll() {
 		return repositoryCita.findAll();
-	}
-
-	@SuppressWarnings("deprecation")
-	@Transactional
-	@PutMapping("/modificarCita/{id}")
-	/***
-	 * Modificamos una cita
-	 * 
-	 * @param id
-	 * @param info
-	 * @return cita modificada
-	 * @throws ParseException
-	 * @throws DiasEntreDosisIncorrectosException
-	 * @throws NoHayDosisException
-	 * @throws SlotVacunacionSuperadoException
-	 */
-	public Cita modificarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException,
-			DiasEntreDosisIncorrectosException, NoHayDosisException, SlotVacunacionSuperadoException {
-		Optional<Cita> c = repositoryCita.findById(id);
-
-		if (!c.isPresent()) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "No exite dicha cita");
-		}
-		Cita cita = c.get();
-		JSONObject jso = new JSONObject(info);
-		String dniPaciente = jso.optString("dniPaciente");
-
-		String nombreCentro = jso.optString("centrosSanitarios");
-		String fechaPrimeraMod = jso.getString("fechaPrimeraDosis");
-		String fechaSegundaMod = jso.getString("fechaSegundaDosis");
-		Paciente usuario = (Paciente) repositoryUsuario.findByDni(c.get().getDniPaciente());
-
-		Date today = new Date();
-		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-		Date dataFormateada = formato.parse(fechaPrimeraMod);
-		Date dataFormateada2 = formato.parse(fechaSegundaMod);
-
-		String fechaHOY = LocalDate.now().toString();
-		long fechaPrimeraDosisMS = new Date(dataFormateada.getYear(), dataFormateada.getMonth(),
-				dataFormateada.getDate(), 0, 0).getTime();
-		long fechaSegundaDosisMS = new Date(dataFormateada2.getYear(), dataFormateada2.getMonth(),
-				dataFormateada2.getDate(), 0, 0).getTime();
-
-		long fechaLimitePD = 1641772800000L;// 10 de enero de 2022
-		long fechaLimiteSD = 1643587200000L;// 31 de enero de 2022
-		if (fechaPrimeraDosisMS <= fechaHOY || fechaSegundaDosisMS <= fechaHOY) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "No puedes viajar en el tiempo");
-		}
-		if (fechaLimitePD <= fechaPrimeraDosisMS || fechaLimiteSD <= fechaSegundaDosisMS) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "No puedes superar las fechas limites");
-		}
-
-		String nombre = usuario.getNombre();
-		Cita citaModificada = modificar(dniPaciente, nombreCentro, fechaPrimeraMod, fechaSegundaMod, nombre);
-		cita.setFechaPrimeraDosis(citaModificada.getFechaPrimeraDosis());
-		cita.setFechaSegundaDosis(citaModificada.getFechaSegundaDosis());
-		return repositoryCita.save(cita);
 	}
 
 	@Transactional
@@ -312,92 +270,6 @@ public class CitaController {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	/***
-	 * Modificamos una cita controlando mas excepciones
-	 * 
-	 * @param dniPaciente
-	 * @param nombreCentro
-	 * @param fechaPrimeraMod
-	 * @param fechaSegundaMod
-	 * @param nombre
-	 * @return cita modificada
-	 * @throws ParseException
-	 * @throws DiasEntreDosisIncorrectosException
-	 * @throws NoHayDosisException
-	 * @throws SlotVacunacionSuperadoException
-	 */
-	private Cita modificar(String dniPaciente, String nombreCentro, String fechaPrimeraMod, String fechaSegundaMod,
-			String nombre) throws ParseException, DiasEntreDosisIncorrectosException, NoHayDosisException,
-			SlotVacunacionSuperadoException {
-		List<Cita> listaCitas = repositoryCita.findAll();
-		Cita c = new Cita();
-		CentroSanitario centroSanitario = obtenerCentro(nombreCentro);
-
-		LocalDate fecha1 = LocalDate.parse(fechaPrimeraMod);
-		LocalDate fecha2 = LocalDate.parse(fechaSegundaMod);
-
-		comprobarFechas(fecha2, fecha1);
-
-		LocalDate fechaActual = LocalDate.now();
-		String nocheVieja = "" + LocalDate.now().getYear() + "-12-31"; // Dia 31 de Enero
-		int contadorAforo = 0; // Aforo para el centro que cogemos
-		boolean asignada = true;
-		if (listaCitas.isEmpty()) {
-			if (centroSanitario.getDosisTotales() >= 2) {
-				++contadorAforo;
-				c = new Cita();
-				c.setNombreCentro(centroSanitario.getNombre());
-				c.setFechaPrimeraDosis(fechaPrimeraMod);
-				c.setFechaSegundaDosis(fechaSegundaMod);
-				
-				c.setDniPaciente(dniPaciente);
-				c.setNombrePaciente(nombre);
-				centroSanitario.setDosisTotales(centroSanitario.getDosisTotales() - 2);
-				repositoryCentro.save(centroSanitario);
-				return c;
-			} else {
-				throw new NoHayDosisException();
-			}
-		} else {
-			asignada = false;
-			while (!asignada) {
-				for (int i = 0; i < listaCitas.size(); i++) { // Esto ahora mismo no hace nada
-					if ((fecha1.getTime() == fechaActual) || (fecha2.getTime() == fechaActual)) {
-						++contadorAforo;
-					}
-				}
-
-				if (contadorAforo >= centroSanitario.getAforo()) {
-					if (new Date(fechaActual).getHours() == centroSanitario.getHoraFin()) {
-						fechaActual += (3600000 * 12); // Proximo dia a las 08.00am
-					} else {
-						fechaActual += 3600000; // Siguiente rango de horas
-					}
-
-					fechasSlot1(aux1, nocheVieja, aux2);
-
-					contadorAforo = 0;
-				} else {
-					++contadorAforo;
-					c = new Cita();
-					c.setNombreCentro(centroSanitario.getNombre());
-					c.setFechaPrimeraDosis(aux1);
-					c.setFechaSegundaDosis(aux2);
-					c.setDniPaciente(dniPaciente);
-					c.setNombrePaciente(nombre);
-					centroSanitario.setDosisTotales(centroSanitario.getDosisTotales() - 2);
-					repositoryCentro.save(centroSanitario);
-					asignada = true;
-					return c;
-
-				}
-			}
-		}
-
-		return c;
-	}
-
 	/***
 	 * Creamos una cita
 	 * 
@@ -415,11 +287,15 @@ public class CitaController {
 		JSONObject json = new JSONObject(info);
 		String email = json.getString("email");
 		try {
-			Paciente paciente = repositoryPaciente.findByEmail(email);
+			Optional<Usuario> optPaciente = repositoryUsuario.findById(email);
+			Paciente paciente = null;
+			if (optPaciente.isPresent() && optPaciente.get().getTipoUsuario().equals("Paciente")) {
+				paciente = (Paciente) optPaciente.get();
+			}
 
 			if (paciente == null)
 				throw new UsuarioNoExisteException();
-			
+
 			List<Cita> listaCitas = repositoryCita.findAllByDniPaciente(paciente.getDni());
 			int citasAsignadas = listaCitas.size();
 			switch (citasAsignadas) {
@@ -486,4 +362,89 @@ public class CitaController {
 		repositoryCita.save(cita);
 
 	}
+
+	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
+	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
+			@PathVariable("fecha") String fecha) {
+		return getCitasPorDia(fecha, email);
+	}
+
+	public List<Cita> getCitasPorDia(String fecha, String email) {
+		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByEmail(email).getCentroAsignado(),
+				fecha);
+	}
+
+	@PostMapping("/modificarCita")
+	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) {
+		try {
+			JSONObject json = new JSONObject(datosCita);
+			String idCita = json.getString("idCita");
+			String idCupo = json.getString("idCupo");
+			String dniPaciente = json.getString("dniPaciente");
+
+			Optional<Cita> citaaModificar = repositoryCita.findById(idCita);
+			Cita citaModificar = citaaModificar.get();
+			Optional<Cupo> optCupoElegido = repositoryCupo.findById(idCupo);
+			Cupo cupoElegido = new Cupo();
+
+			if (optCupoElegido.isPresent())
+				cupoElegido = optCupoElegido.get();
+
+			List<Cita> listaCitas = repositoryCita.findAllByDniPaciente(dniPaciente);
+			listaCitas.sort(Comparator.comparing(Cita::getFecha));
+			int citasAsignadas = listaCitas.size();
+
+			if (citasAsignadas < 1)
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+						"No se puede modificar citas puesto que no dispone de ninguna cita asignada");
+
+			if (cupoElegido.getPersonasRestantes() < 1)
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+						"No hay hueco para cita el dia " + cupoElegido.getFecha() + " a las " + cupoElegido.getHora());
+
+			if (citaModificar.isUsada())
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+						"No se puede modificar su cita puesto que ya está vacunado");
+
+			if (listaCitas.size() == 2) {
+				int indiceCita = -1;
+				if (citaModificar.getId().equalsIgnoreCase(listaCitas.get(0).getId()))
+					indiceCita = 0;
+				else if (citaModificar.getId().equalsIgnoreCase(listaCitas.get(1).getId()))
+					indiceCita = 1;
+
+				switch (indiceCita) {
+				case 0:
+					if (LocalDate.parse(cupoElegido.getFecha()).isAfter(LocalDate.parse(listaCitas.get(1).getFecha()))
+							|| LocalDate.parse(cupoElegido.getFecha())
+									.isEqual(LocalDate.parse(listaCitas.get(1).getFecha())))
+						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+					break;
+				case 1:
+					if (LocalDate.parse(cupoElegido.getFecha())
+							.isBefore(LocalDate.parse(listaCitas.get(0).getFecha()).plusDays(21)))
+						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+					break;
+				default:
+					break;
+				}
+			}
+			citaModificar.setFecha(cupoElegido.getFecha());
+			citaModificar.setHora(cupoElegido.getHora());
+			repositoryCita.save(citaModificar);
+
+			cupoElegido.setPersonasRestantes(cupoElegido.getPersonasRestantes() - 1);
+			repositoryCupo.save(cupoElegido);
+
+		} catch (ResponseStatusException e) {
+			if (e.getStatus() == HttpStatus.FORBIDDEN) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+			} else if (e.getStatus() == HttpStatus.NOT_FOUND) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+			}
+		}
+	}
+
 }
