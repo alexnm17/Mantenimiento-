@@ -133,7 +133,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "post",
 					contentType: 'application/json',
 					success: function() {
-						app.router.go({ path: "administrarCitas" });
+						history.back()
 						$.confirm({
 							title: 'Confirmado',
 							content: 'Cita modificada',
@@ -141,7 +141,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							typeAnimated: true,
 							buttons: {
 								Cerrar: function() {
-									//Boton para cerrar el popup de confirmación
 								}
 							}
 						});
