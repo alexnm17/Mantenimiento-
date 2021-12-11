@@ -62,21 +62,16 @@
 		<div class="w3-container" style="margin-top:20px" id="showcase">
 			<h1 class="w3-jumbo" data-bind="html : centroAsignado" style="text-align:center;"><b></b></h1>
 			<h5 style="text-align:center;">Fecha citas: <input type="date" data-bind="value : fecha, event:{change: VerCitasOtroDia}" ></h5>
-	<!--	<h5 style="text-align:center;">Hora de inicio: <input type="time" data-bind="value : horaInicio" disabled>
-			</h5>
-			<h5 style="text-align:center;">Hora de fin: <input type="time" data-bind="value : horaFin" disabled></h5> -->
 			<h3 style="text-align:center;"><b>CITAS DE OTROS DIAS</b></h3>
 			<div class="scroll">
 				<table class="w3-table-all w3-centered">
 					<tr class="w3-teal">
 						<th>DNI Paciente</th>
-						<th>Nombre Paciente</th>
 						<th>Hora cita</th>
 					</tr>
 					<!-- ko foreach : citas -->
 					<tr>
 						<td data-bind="html : dniPaciente"></td>
-						<td data-bind="html : nombreUsuario"></td>
 						<td data-bind="html : hora"></td>
 						
 						

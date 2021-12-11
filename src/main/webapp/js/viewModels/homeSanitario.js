@@ -21,8 +21,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.dosisAdministradas = ko.observable("");
 			self.localidad = ko.observable("");
 			self.provincia = ko.observable("");		
-			self.fechaPrimeraDosis = ko.observable("");
-			self.fechaSegundaDosis = ko.observable("");
+			self.fecha = ko.observable("");
+			self.hora = ko.observable("");
 
 			self.horaInicio = ko.observable("");
 			self.horaFin = ko.observable("");
@@ -176,21 +176,21 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 						var centroAsignado;
 						var date;
 						var date2;
-						var fechaPrimeraDosis;
-						var fechaSegundaDosis;
+						var fecha;
+						var hora;
 						for (let i=0; i<response.length; i++) {
-							date = new Date(response[i].fechaPrimeraDosis);
-							date2 = new Date(response[i].fechaSegundaDosis);
+							date = new Date(response[i].fecha);
+							time = new Time(response[i].hora);
 							centroAsignado = response[i].nombreCentro;
-							fechaPrimeraDosis = date.toLocaleString().slice(0, 10);
-						    fechaSegundaDosis = date2.toLocaleString().slice(0, 10);
+							fecha = date.toLocaleString().slice(0, 10);
+						    hora = time.toLocaleString().slice(0, 10);
 							let cita = {
 									id : response[i].id,
 									dniPaciente : response[i].dniPaciente,
 									nombreUsuario : response[i].nombrePaciente,
 									centroAsignado: response[i].nombreCentro,
-									fechaPrimeraDosis: date.toLocaleString(),
-									fechaSegundaDosis : date2.toLocaleString(),
+									fecha: date.toLocaleString(),
+									hora : time.toLocaleString(),
 									mostrarCheckbox: function(fecha){
 										return fecha.split(' ')[0] == self.fecha();
 									},
@@ -199,7 +199,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 									},			
 							};
 							var fechaActual = new Date().toLocaleString().split(' ')[0];
-							if(fechaPrimeraDosis.toLocaleString().split(' ')[0] == fechaActual || fechaSegundaDosis.toLocaleString().split(' ')[0] == fechaActual){
+							if(fecha.toLocaleString().split(' ')[0] == fechaActual){
 								self.citas.push(cita);
 							}
 									

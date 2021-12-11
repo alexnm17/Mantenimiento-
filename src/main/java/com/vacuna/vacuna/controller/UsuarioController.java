@@ -279,12 +279,11 @@ public class UsuarioController {
 		String centroAsignado = jso.optString("centroAsignado");
 		String localidad = jso.optString("localidad");
 		String provincia = jso.optString("provincia");
+		
+		
 		byte[] pwd = md.digest(password.getBytes());
-		
-		
 		Usuario u =  repository.findByEmail(email);
-		
-		if(!formValido(nombre, email, centroAsignado, password)) {
+		if(!formValido(nombre, email, centroAsignado)) {
 			throw new DatosIncompletosException();
 		}
 		if (u == null) {

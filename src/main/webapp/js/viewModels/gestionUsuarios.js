@@ -13,7 +13,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.tipoUsuario = ko.observable("");
 			self.password = ko.observable("");
 			self.centroAsignado = ko.observable("");
-			self.dosisAdministradas = ko.observable("");
 			self.localidad = ko.observable("");
 			self.provincia = ko.observable("");		
 			
@@ -95,7 +94,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							dni : response[i].dni,
 							tipoUsuario : response[i].tipoUsuario,						
 							centroAsignado : response[i].centroAsignado,
-							dosisAdministradas : response[i].dosisAdministradas,
 							localidad : response[i].localidad,
 							provincia : response[i].provincia,
 							eliminar : function() {

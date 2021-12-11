@@ -138,7 +138,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			}
 
 			modificarCita(idCita) {
-				localStorage.setItem("idCitaAModificar",idCita)
+				localStorage.setItem("idCitaAModificar", idCita)
 				app.router.go({ path: "modificarCita" });
 			}
 
@@ -204,6 +204,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 			crearCita() {
 				app.router.go({ path: "solicitarCita" });
+			}
+
+			irHomePersonalDeCitas() {
+				app.router.go({ path: "homePersonalDeCitas" });
 			}
 
 			connected() {

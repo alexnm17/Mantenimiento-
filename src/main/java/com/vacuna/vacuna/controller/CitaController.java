@@ -146,45 +146,6 @@ public class CitaController {
 		return null;
 	}
 
-	@Transactional
-	@PutMapping("/eliminarCita/{id}")
-	/***
-	 * Eliminamos solo una cita
-	 * 
-	 * @param id
-	 * @param info
-	 * @return cita eliminada
-	 * @throws ParseException
-	 */
-	public Cita eliminarCita(@PathVariable String id, @RequestBody Map<String, Object> info) throws ParseException {
-
-		Optional<Cita> c = repositoryCita.findById(id);
-		Cita cita = new Cita();
-
-		if (c.isPresent()) {
-			cita = c.get();
-		}
-
-		JSONObject jso = new JSONObject(info);
-		String nombreCentro = jso.optString("centrosSanitarios");
-		String fechaPrimeraMod = jso.getString("fechaPrimeraDosis");
-
-		CentroSanitario cs = repositoryCentro.findByNombre(nombreCentro);
-		cs.setDosisTotales(cs.getDosisTotales() + 1);
-		repositoryCentro.save(cs);
-
-		DateFormat fechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		Date citaMod = fechaHora.parse(fechaPrimeraMod);
-
-		/*
-		 * cita.setFechaPrimeraDosis(citaMod.getTime());
-		 * 
-		 * cita.setFechaSegundaDosis(0);
-		 */
-
-		return repositoryCita.save(cita);
-	}
-
 	@DeleteMapping("/anularCita/{id}")
 	public void anularCita(HttpSession session, @PathVariable String id) {
 		try {
@@ -376,6 +337,17 @@ public class CitaController {
 
 	}
 
+	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
+	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
+			@PathVariable("fecha") String fecha) {
+		return getCitasPorDia(fecha, email);
+	}
+
+	public List<Cita> getCitasPorDia(String fecha, String email) {
+		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByEmail(email).getCentroAsignado(),
+				fecha);
+	}
+
 	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario CentroSanitario) {
 		Cupo cupo = null;
 
@@ -407,17 +379,6 @@ public class CitaController {
 				usuario.getDni());
 		repositoryCita.save(cita);
 
-	}
-
-	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
-	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
-			@PathVariable("fecha") String fecha) {
-		return getCitasPorDia(fecha, email);
-	}
-
-	public List<Cita> getCitasPorDia(String fecha, String email) {
-		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByEmail(email).getCentroAsignado(),
-				fecha);
 	}
 
 	@PostMapping("/modificarCita")
