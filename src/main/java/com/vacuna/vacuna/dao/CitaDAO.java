@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import com.vacuna.vacuna.model.Cita;
+import com.vacuna.vacuna.model.Usuario;
 
 @Repository
 /***
@@ -42,6 +43,7 @@ public interface CitaDAO extends MongoRepository<Cita, String>{
 
 	List<Cita> findAllByDniPaciente(String dni);
 
+	Cita findByDniPacienteAndFecha(String dni, String fechaHoy);
 	
 
 	

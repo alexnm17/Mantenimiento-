@@ -337,6 +337,12 @@ public class CitaController {
 
 	}
 
+	@GetMapping("/getCitasHoy/{email}")
+	public List<Cita> getCitasHoy(@PathVariable("email") String email) {
+		String fecha = LocalDate.now().toString();
+		return getCitasPorDia(fecha, email);
+	}
+	
 	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
 	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
 			@PathVariable("fecha") String fecha) {

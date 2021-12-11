@@ -9,8 +9,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.vacuna.vacuna.dao.CentroSanitarioDAO;
 import com.vacuna.vacuna.dao.CitaDAO;
@@ -42,6 +46,10 @@ import com.vacuna.vacuna.model.Paciente;
 import com.vacuna.vacuna.model.PersonalDeCitas;
 import com.vacuna.vacuna.model.Sanitario;
 import com.vacuna.vacuna.model.Usuario;
+
+import edu.esi.uclm.exceptions.SigevaException;
+import edu.esi.uclm.model.CentroVacunacion;
+import edu.esi.uclm.model.EstadoVacunacion;
 
 /***
  * 
@@ -403,4 +411,29 @@ public class UsuarioController {
 		return true;
 	}
 	
+	@PostMapping("/marcarVacunado")
+	public void marcarVacunado(HttpSession session, @RequestBody Map<String, Object> datosPaciente) {
+		try {
+			JSONObject jsonPaciente = new JSONObject(datosPaciente);
+			String dni = jsonPaciente.getString("dni");
+			Usuario usuarioVacunado = repository.findByDniAndTipoUsuario(dni, "Paciente");
+			CentroSanitario centroVacunacion = repositoryCentro.findByNombre(usuarioVacunado.getCentroAsignado());
+
+			String fechaHoy = LocalDate.now().toString();
+			Cita citaDeEseDia = repositoryCita.findByDniPacienteAndFecha(usuarioVacunado.getDni(), fechaHoy);
+
+			if (citaDeEseDia.isUsada())
+				throw new ResponseStatusException(HttpStatus.CONFLICT,
+						"No se puede vacunar un paciente que ha sido vacunado hoy mismo");
+
+			centroVacunacion.setDosisTotales(centroVacunacion.getDosisTotales() - 1);
+			repositoryCentro.save(centroVacunacion);
+
+			citaDeEseDia.setUsada(true);
+			repositoryCita.save(citaDeEseDia);
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+
+	}
 }
