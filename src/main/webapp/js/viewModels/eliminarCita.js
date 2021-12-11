@@ -8,37 +8,23 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 			self.cita = ko.observable();
 			self.cita = app.cita;
-			self.botonFecha1 = ko.observable(1);
-			var date = app.cita.fechaPrimeraDosis.toString().split(" ",1);
-			var newDate = date.toString().split("/").reverse().join("-");
-			var fPrimera = new Date(newDate);
-			var final = fPrimera.toISOString().slice(0, 10);
-			self.inputFechaPrimera=ko.observable(true);
+			self.botonFecha = ko.observable(1);
+			var date = app.cita.fecha.toString().split(" ",1);
+			var f = new Date(newDate);
+			var final = f.toISOString().slice(0, 10);
+			self.inputFecha=ko.observable(true);
 			var today = Date.now();
-			var final3 =  app.cita.fechaPrimeraDosis;
+			var final3 =  app.cita.fecha;
 			self.nombre = ko.observable("");
 			self.tipoUsuario = ko.observable("");
 
-			if(today>fPrimera.getTime()){
+			if(today>f.getTime()){
 				console.log("No se puede eliminar");
-				self.botonFecha1(2);
+				self.botonFecha(2);
 			}else{
 				console.log("Se puede eliminar");
-				self.botonFecha1(1);
+				self.botonFecha(1);
 			}
-			var final2 = "";
-			if(app.cita.fechaSegundaDosis != 0){
-				var date2 = app.cita.fechaSegundaDosis.toString().split(" ",1);
-				var newDate2 = date2.toString().split("/").reverse().join("-");
-				var fSegunda = new Date(newDate2);
-				var fSegunda = new Date(newDate2);
-				final2 = fSegunda.toISOString().slice(0, 10);
-				var final4 =  app.cita.fechaSegundaDosis;
-			}
-			
-
-			//self.fechaPrimeraDosis = ko.observable(final);
-			//self.fechaSegundaDosis = ko.observable(final2);
 			
 			self.fecha = ko.observable(final3);
 			self.hora = ko.observable(final4);

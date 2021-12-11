@@ -104,7 +104,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			eliminarCita(id) {
 				let self = this;
 				let data = {
-					url: "cita/eliminarCita/" + id,
+					url: "cita/anularCita/" + id,
 					type: "delete",
 					contentType: 'application/json',
 					success: function(response) {
@@ -137,7 +137,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				});
 			}
 
-			modificarCita() {
+			modificarCita(idCita) {
+				localStorage.setItem("idCitaAModificar",idCita)
 				app.router.go({ path: "modificarCita" });
 			}
 
