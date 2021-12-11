@@ -79,7 +79,6 @@
 						<th>Dosis totales</th>
 						<th>Localidad</th>
 						<th>Provincia</th>
-						<th>Eliminar</th>
 						<th>Modificar</th>
 					</tr>
 					<!-- ko foreach : centros -->
@@ -88,12 +87,8 @@
 						<td data-bind="html : dosisTotales"></td>
 						<td data-bind="html : localidad"></td>
 						<td data-bind="html : provincia"></td>
-
-
-						<td><img data-bind="click : function() { $parent.eliminarCentro(id); }" class="iconoImg"
-								src="css/delete.png" style="width:10%"></td>
-						<td><img data-bind="click : modificarCentros" class="iconoImg" src="css/modify.png"
-								style="width:10%"></td>
+						<td><img data-bind="click : function() { $parent.modificarCentro(id); }" class="iconoImg"
+								src="css/modify.png" style="width:10%" alt="icono modificar centro"></td>
 					</tr>
 					<!-- /ko -->
 				</table>
