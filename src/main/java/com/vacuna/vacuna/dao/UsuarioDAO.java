@@ -69,4 +69,6 @@ public interface UsuarioDAO extends MongoRepository<Usuario, String> {
 	 */
 	CentroSanitario findByCentroAsignado(String email);
 
+	Usuario findByDniAndTipoUsuario(String dni, String string);
+
 }
