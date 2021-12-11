@@ -150,17 +150,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			}
 
 
-
-			eliminarCita(id) {
-				app.idc = id;
-				app.cita = this;
-				app.router.go({ path: "eliminarCita" });
-			}
-
 			eliminarCita(id) {
 				let self = this;
 				let data = {
-					url: "cita/eliminarCita/" + id,
+					url: "cita/anularCita/" + id,
 					type: "delete",
 					contentType: 'application/json',
 					success: function(response) {
@@ -194,7 +187,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}
 				});
 			}
-
 			comprobarRol() {
 				let self = this;
 				let data = {

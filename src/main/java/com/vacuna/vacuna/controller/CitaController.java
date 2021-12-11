@@ -146,34 +146,6 @@ public class CitaController {
 		return null;
 	}
 
-	@Transactional
-	@PutMapping("/eliminarCita/{id}")
-	/***
-	 * Eliminamos solo una cita
-	 * 
-	 * @param id
-	 * @param info
-	 * @return cita eliminada
-	 * @throws ParseException
-	 */
-	public Cita eliminarCita(@PathVariable String id, @RequestBody Map<String, Object> info) {
-
-		Optional<Cita> c = repositoryCita.findById(id);
-		Cita cita = new Cita();
-
-		if (c.isPresent()) {
-			cita = c.get();
-		}
-
-		JSONObject jso = new JSONObject(info);
-		String nombreCentro = jso.optString("centrosSanitarios");
-		CentroSanitario cs = repositoryCentro.findByNombre(nombreCentro);
-		cs.setDosisTotales(cs.getDosisTotales() + 1);
-		repositoryCentro.save(cs);
-
-		return repositoryCita.save(cita);
-	}
-
 	@DeleteMapping("/anularCita/{id}")
 	public void anularCita(HttpSession session, @PathVariable String id) {
 		try {

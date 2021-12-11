@@ -10,7 +10,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.cita = app.cita;
 			self.botonFecha = ko.observable(1);
 			var date = app.cita.fecha.toString().split(" ",1);
-			var f = new Date(newDate);
+			var f = new Date();
 			var final = f.toISOString().slice(0, 10);
 			self.inputFecha=ko.observable(true);
 			var today = Date.now();
