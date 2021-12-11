@@ -153,6 +153,11 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				$.ajax(data);
 			}
 
+
+			volver(){
+				app.router.go({ path: "homePaciente" });
+			}
+
 			connected() {
 				accUtils.announce('Inicio page loaded.');
 				document.title = "Modificar cita";
