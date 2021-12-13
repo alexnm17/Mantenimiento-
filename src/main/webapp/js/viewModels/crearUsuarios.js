@@ -151,7 +151,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					provincia: this.provincia(),
 					
 				};
-				this.clear();
 				let data = {
 					data: JSON.stringify(info),
 					url: "Usuario/add",
@@ -177,9 +176,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}
 				};
 				$.ajax(data);
+				this.gestionUsuarios();
 			}
-
-
 
 			getUserConnect() {
 				let self = this;
@@ -198,20 +196,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}
 				};
 				$.ajax(data);
-			}
-			
-			
-			clear(){
-				self.nombre = ""
-				self.email = ""
-				self.dni = 
-				self.tipoUsuario = 
-				self.password =
-				self.password2 = ko.observable("");
-				self.centroAsignado = ko.observable("");
-				self.dosisAdministradas = ko.observable("");
-				self.localidad = ko.observable("");
-				self.provincia = ko.observable("");
 			}
 			
 			connected() {

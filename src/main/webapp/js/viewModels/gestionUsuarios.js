@@ -15,8 +15,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.centroAsignado = ko.observable("");
 			self.localidad = ko.observable("");
 			self.provincia = ko.observable("");		
-			
-
 			self.nombreUsuario = ko.observable("");
 			
 			
@@ -86,7 +84,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				success : function(response) {
 				console.log(response);
 					self.usuarios([]);
-					 for (let i=0; i<response.length; i++) {
+					for (let i=0; i<response.length; i++) {
 						let paciente = {
 							nombre : response[i].nombre,
 							email : response[i].email,
@@ -151,7 +149,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 		eliminarUsuario(email) {
 			let self = this;
-			console.log("Hey");
 			let data = {
 				url : "Usuario/eliminarUsuario/" + email,
 				type : "delete",
@@ -170,9 +167,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					self.getUsuarios();
 				},
 				error : function(response) {
-					$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
-					
-					
+					$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});										
 				}
 			};
 			$.confirm({

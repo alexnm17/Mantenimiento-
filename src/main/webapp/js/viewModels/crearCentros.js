@@ -199,6 +199,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}
 				};
 				$.ajax(data);
+				this.gestionCentros();
 			}
 
 			modificarCentro(id) {
