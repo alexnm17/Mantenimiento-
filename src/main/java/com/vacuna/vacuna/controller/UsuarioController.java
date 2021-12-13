@@ -2,10 +2,7 @@ package com.vacuna.vacuna.controller;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +43,6 @@ import com.vacuna.vacuna.model.Paciente;
 import com.vacuna.vacuna.model.PersonalDeCitas;
 import com.vacuna.vacuna.model.Sanitario;
 import com.vacuna.vacuna.model.Usuario;
-
-import edu.esi.uclm.exceptions.SigevaException;
-import edu.esi.uclm.model.CentroVacunacion;
-import edu.esi.uclm.model.EstadoVacunacion;
 
 /***
  * 
@@ -178,33 +171,6 @@ public class UsuarioController {
 	public String getNombrePaciente(@PathVariable String dni){
 		Paciente u = (Paciente) repository.findByDni(dni);
 		return u.getNombre();	
-	}
-
-	
-	@GetMapping("/dosisMarcadas/{email}")
-	/***
-	 * Metodo para marcar las dosis de los pacientes
-	 * @param email
-	 * @return dosis
-	 */
-	public List<Integer> dosisMarcadas(@PathVariable String email){
-		Usuario sanitario = repository.findByEmail(email);
-		CentroSanitario cs = repositoryCentro.findByNombre(sanitario.getCentroAsignado());
-		List<Cita> citas = repositoryCita.findAllByNombreCentro(cs.getNombre());
-		List<Integer> dosis = new ArrayList<>();
-		for(int i= 0; i < citas.size(); i++) {	
-			Cita c =citas.get(i);
-			Paciente paciente = (Paciente) repository.findByDni(c.getDniPaciente());
-			String fechaPrimeraDosis = c.getFechaPrimeraDosis();
-			String fechaSegundaDosis = c.getFechaSegundaDosis();
-			LocalDate today = LocalDate.now();
-		
-		    if(LocalDate.parse(fechaPrimeraDosis).isEqual(today) || LocalDate.parse(fechaSegundaDosis).equals(today) ) {
-				dosis.add(Integer.parseInt(paciente.getDosisAdministradas()));
-			}
-			
-		}
-		return dosis;
 	}
 
 	

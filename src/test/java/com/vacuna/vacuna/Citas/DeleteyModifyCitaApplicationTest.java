@@ -1,9 +1,12 @@
 package com.vacuna.vacuna.Citas;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -17,10 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -63,24 +68,34 @@ class DeleteyModifyCitaApplicationTest {
 	}
 	@BeforeEach
 	void setupTest() {
-		centro = new CentroSanitario("Centro Cita", 2000, 2, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro = new CentroSanitario("Centro Cita", 2000, "Ciudad Real", "Ciudad Real");
 		centroDAO.save(centro);
 		p = new Paciente("Cristina eliminarCita", "eliminarcita@gmail.com","Hola1234=".getBytes(), "05724787H", "Paciente", "Centro Cita", "0", "CR", "CR");
 		DAO.save(p);
-		c = new Cita(1640471862, 1642286262, "Centro Cita", "05724787H", "Cristina eliminarCita");
+		c= new Cita("2021-12-01","09:00", "Centro Prueba Cita", "05724787H");
 		citaDAO.save(c);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
-	/***
-	 * Test borrar cita completa correcto
-	 * @throws Exception
-	 */
-	void deleteCitaCompletoCorrecto() throws Exception {
-		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.delete("/cita/eliminarCitaCompleta/"+c.getId())
-				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().is(200));
+	void testAnularCitaCorrecto() {
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("id", "d07ff562-00a7-482f-8d88-70c87746871b");
+		
+		JSONObject json = new JSONObject(mapa);
+		String body = json.toString();
+		
+		try {
+			mockMvc.perform(MockMvcRequestBuilders.delete("/cita/anularCita")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(body))
+					.andExpect(MockMvcResultMatchers.status().isOk());
+			//si no hay excepciones va bien
+			assertTrue(true);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
 	}
 	
 	/***

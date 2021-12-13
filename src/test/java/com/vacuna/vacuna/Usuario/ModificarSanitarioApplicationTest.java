@@ -69,7 +69,7 @@ class ModificarSanitarioApplicationTest {
 	
 	@BeforeAll
 	public void setupTest() {
-		centro = new CentroSanitario(TEST_CENTROASIGNADO, 2000, 2, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro =  new CentroSanitario("Centro Prueba 1", 300, "Ciudad Real", "Ciudad Real");
 		DAO.save(centro);
 		s = new Sanitario(TEST_NOMBRE, TEST_EMAIL,TEST_PASSWORD.getBytes(), TEST_DNI, TEST_TIPOUSUARIO, TEST_CENTROASIGNADO);
 		userDAO.save(s);
@@ -121,18 +121,6 @@ class ModificarSanitarioApplicationTest {
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().is(409));
 	}
-
-	@Test
-	/***
-	 * 
-	 * @throws Exception
-	 */
-	void getDosisMarcadas() throws Exception {
-		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.put("/Usuario/dosisMarcadas/"+s.getEmail())
-				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().is(405));
-	}
-
 	
 	@Test
 	/***
