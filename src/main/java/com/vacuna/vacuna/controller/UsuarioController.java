@@ -195,11 +195,10 @@ public class UsuarioController {
 		for(int i= 0; i < citas.size(); i++) {	
 			Cita c =citas.get(i);
 			Paciente paciente = (Paciente) repository.findByDni(c.getDniPaciente());
-			String fechaPrimeraDosis = c.getFechaPrimeraDosis();
-			String fechaSegundaDosis = c.getFechaSegundaDosis();
+			String fecha = c.getFecha();
 			LocalDate today = LocalDate.now();
 		
-		    if(LocalDate.parse(fechaPrimeraDosis).isEqual(today) || LocalDate.parse(fechaSegundaDosis).equals(today) ) {
+		    if(LocalDate.parse(fecha).isEqual(today)) {
 				dosis.add(Integer.parseInt(paciente.getDosisAdministradas()));
 			}
 			
