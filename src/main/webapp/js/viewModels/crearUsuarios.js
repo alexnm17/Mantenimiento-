@@ -149,8 +149,9 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					dosisAdministradas: this.dosisAdministradas(),
 					localidad: this.localidad(),
 					provincia: this.provincia(),
-
+					
 				};
+				this.clear();
 				let data = {
 					data: JSON.stringify(info),
 					url: "Usuario/add",
@@ -198,7 +199,21 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				};
 				$.ajax(data);
 			}
-
+			
+			
+			clear(){
+				self.nombre = ""
+				self.email = ""
+				self.dni = 
+				self.tipoUsuario = 
+				self.password =
+				self.password2 = ko.observable("");
+				self.centroAsignado = ko.observable("");
+				self.dosisAdministradas = ko.observable("");
+				self.localidad = ko.observable("");
+				self.provincia = ko.observable("");
+			}
+			
 			connected() {
 				accUtils.announce('Inicio page loaded.');
 				document.title = "Crear Usuario";

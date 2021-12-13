@@ -47,10 +47,6 @@ import com.vacuna.vacuna.model.PersonalDeCitas;
 import com.vacuna.vacuna.model.Sanitario;
 import com.vacuna.vacuna.model.Usuario;
 
-import edu.esi.uclm.exceptions.SigevaException;
-import edu.esi.uclm.model.CentroVacunacion;
-import edu.esi.uclm.model.EstadoVacunacion;
-
 /***
  * 
  * @author crist
