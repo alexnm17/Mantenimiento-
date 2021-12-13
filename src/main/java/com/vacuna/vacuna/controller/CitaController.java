@@ -388,7 +388,7 @@ public class CitaController {
 	}
 
 	@PostMapping("/modificarCita")
-	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) {
+	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) throws VacunaException {
 		try {
 			JSONObject json = new JSONObject(datosCita);
 			String idCita = json.getString("idCita");
