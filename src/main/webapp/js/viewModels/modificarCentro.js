@@ -150,6 +150,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		connected() {
 			accUtils.announce('Inicio page loaded.');
 			document.title = "Inicio";
+			this.comprobarRol();
 			this.getUserConnect();
 		};
 

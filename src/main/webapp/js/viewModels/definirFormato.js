@@ -1,4 +1,5 @@
 
+
 define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 	'jquery'], function(ko, app, moduleUtils, accUtils, $) {
 

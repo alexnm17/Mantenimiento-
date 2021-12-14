@@ -1,13 +1,8 @@
 
 package com.vacuna.vacuna.controller;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,7 +14,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,14 +28,11 @@ import com.vacuna.vacuna.dao.CentroSanitarioDAO;
 import com.vacuna.vacuna.dao.CitaDAO;
 import com.vacuna.vacuna.dao.CupoDAO;
 import com.vacuna.vacuna.dao.FormatoVacunacionDAO;
-import com.vacuna.vacuna.dao.PacienteDAO;
 import com.vacuna.vacuna.dao.UsuarioDAO;
 import com.vacuna.vacuna.exception.CentrosNoEncontradosException;
 import com.vacuna.vacuna.exception.CitasNoEncontradasException;
 import com.vacuna.vacuna.exception.ControlHorasVacunacionException;
 import com.vacuna.vacuna.exception.CupoNoEncontradoException;
-import com.vacuna.vacuna.exception.DiasEntreDosisIncorrectosException;
-import com.vacuna.vacuna.exception.ErrorDosisAdministradasException;
 import com.vacuna.vacuna.exception.NoHayDosisException;
 import com.vacuna.vacuna.exception.SlotVacunacionSuperadoException;
 import com.vacuna.vacuna.exception.UsuarioNoExisteException;
@@ -81,9 +72,6 @@ public class CitaController {
 	@Autowired
 	private CupoDAO repositoryCupo;
 
-	@Autowired
-	private PacienteDAO repositoryPaciente;
-
 	@GetMapping("/getTodos")
 	/***
 	 * Obtenemos la lista de las citas
@@ -116,34 +104,6 @@ public class CitaController {
 		} catch (Exception e) {
 			throw new CentrosNoEncontradosException();
 		}
-	}
-
-	@Transactional
-	@DeleteMapping("/eliminarCitaCompleta/{id}")
-	/***
-	 * Eliminamos las dos citas, la de la primera dosis y la de la segunda
-	 * 
-	 * @param id
-	 * @return null
-	 */
-	public Cita eliminar1CitaCompleta(@PathVariable String id) {
-		Optional<Cita> c = repositoryCita.findById(id);
-
-		if (c.isPresent()) {
-			Cita citaAux = new Cita();
-			citaAux = c.get();
-			Paciente p = (Paciente) repositoryUsuario.findByDni(c.get().getDniPaciente());
-			p.setDosisAdministradas("0");
-			repositoryUsuario.save(p);
-			String nombreCentro = citaAux.getNombreCentro();
-			CentroSanitario cs = repositoryCentro.findByNombre(nombreCentro);
-			cs.setDosisTotales(cs.getDosisTotales() + 1);
-			repositoryCentro.save(cs);
-			repositoryCita.deleteById(id);
-
-		}
-
-		return null;
 	}
 
 	@DeleteMapping("/anularCita/{id}")
@@ -248,36 +208,6 @@ public class CitaController {
 
 	}
 
-	private CentroSanitario obtenerCentro(String nombreCentro) {
-		List<CentroSanitario> listaCentros = repositoryCentro.findAll();
-		for (int i = 0; i < listaCentros.size(); i++) {
-			if (listaCentros.get(i).getNombre().equals(nombreCentro)) {
-				centroSanitario = listaCentros.get(i);
-				return centroSanitario;
-			}
-		}
-		return centroSanitario;
-	}
-
-	private void comprobarFechas(LocalDate fecha2, LocalDate fecha1) throws DiasEntreDosisIncorrectosException {
-		if (fecha2.isBefore(fecha1.plusDays(21))) {
-			throw new DiasEntreDosisIncorrectosException();
-		}
-	}
-
-	private void fechasSlot(LocalDate fechaActual, LocalDate nocheVieja) throws SlotVacunacionSuperadoException {
-		LocalDate fechaLimite = LocalDate.parse("" + LocalDate.now().getYear() + "-12-11");
-		if (fechaActual.isAfter(nocheVieja) || fechaActual.isAfter(fechaLimite)) {
-			throw new SlotVacunacionSuperadoException();
-		}
-	}
-
-	private void fechasSlot1(Long aux1, Long nocheVieja, Long aux2) throws SlotVacunacionSuperadoException {
-		if ((aux1 >= nocheVieja) || (aux2 >= nocheVieja)) {
-			throw new SlotVacunacionSuperadoException();
-		}
-	}
-
 	/***
 	 * Creamos una cita
 	 * 
@@ -289,8 +219,9 @@ public class CitaController {
 	 * @throws NoHayDosisException
 	 */
 	@PostMapping("/solicitarCita")
-	public void solicitarCita(@RequestBody Map<String, Object> info)
+	public void solicitarCita(@RequestBody Map<String, Object> info, HttpSession session)
 			throws UsuarioNoExisteException, CupoNoEncontradoException {
+	
 		JSONObject json = new JSONObject(info);
 		String email = json.getString("email");
 		try {
