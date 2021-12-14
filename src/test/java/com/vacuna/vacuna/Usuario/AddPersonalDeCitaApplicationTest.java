@@ -40,7 +40,7 @@ import net.minidev.json.JSONObject;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(Lifecycle.PER_CLASS)
-class AddSanitarioApplicationTest {
+class AddPersonalDeCitaApplicationTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -52,13 +52,13 @@ class AddSanitarioApplicationTest {
 	private UsuarioDAO userDAO;
 	
 	private CentroSanitario centro;
-	private String TEST_NOMBRE = "Cristina Sanitario";
-	private String TEST_EMAIL = "pruebaSanitario@gmail.com";
+	private String TEST_NOMBRE = "Jaime Personal de Citas";
+	private String TEST_EMAIL = "pruebaPersonalDeCitas@gmail.com";
 	private String TEST_PASSWORD = "Hola1236=";
 	private String TEST_PASSWORD2 = "Hola1236=";
 	private String TEST_DNI = "05724787H";
-	private String TEST_TIPOUSUARIO = "Sanitario";
-	private String TEST_CENTROASIGNADO = "Centro Prueba add sanitario";
+	private String TEST_TIPOUSUARIO = "Personal de Citas";
+	private String TEST_CENTROASIGNADO = "Centro Prueba add personal cita";
 	
 	@BeforeEach
 	public void setupMockMvc() {
@@ -89,7 +89,6 @@ class AddSanitarioApplicationTest {
 		json.put("centroAsignado", TEST_CENTROASIGNADO);
 		json.put("localidad", "");
 		json.put("provincia", "");
-		json.put("dosisAdministradas", "");
 		System.out.println(json.toJSONString());
 		
 		final ResultActions resultado = mockMvc.perform(put("/Usuario/add")

@@ -1,6 +1,16 @@
 package com.vacuna.vacuna.Citas;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -16,20 +26,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.vacuna.vacuna.VacunaApplication;
 import com.vacuna.vacuna.dao.CentroSanitarioDAO;
 import com.vacuna.vacuna.dao.CitaDAO;
+import com.vacuna.vacuna.dao.CupoDAO;
 import com.vacuna.vacuna.dao.UsuarioDAO;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
+import com.vacuna.vacuna.model.Cupo;
 import com.vacuna.vacuna.model.Paciente;
+
 /***
  * 
  * @author crist
@@ -55,7 +70,14 @@ class AddCitaApplicationTest {
 	private Paciente pError;
 	@Autowired
 	private CitaDAO citaDAO;
-	
+	@Autowired
+	private CupoDAO cupoDAO;
+	private Cupo cupo;
+	private Cupo cupo2;
+	private List<Cita> listaCitasUsuario = new ArrayList<Cita>();
+	private List<Cupo> listaCuposUsuario = new ArrayList<Cupo>();
+	private Cita citaPrueba;
+
 	
 	private CentroSanitario centro;
 	private String TEST_NOMBRE = "Cristina Paciente";
@@ -79,31 +101,45 @@ class AddCitaApplicationTest {
 	@BeforeAll
 
 	public void setupTest() {
-		centro = new CentroSanitario(TEST_CENTROASIGNADO, 2000, 2, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro = new CentroSanitario(TEST_CENTROASIGNADO, 2000, "Ciudad Real", "Ciudad Real");
 		DAO.save(centro);
+		
 		p = new Paciente(TEST_NOMBRE, TEST_EMAIL,TEST_PASSWORD.getBytes(), TEST_DNI, TEST_TIPOUSUARIO, TEST_CENTROASIGNADO, TEST_DOSIS, TEST_LOCALIDAD, TEST_PROVINCIA);
 		pError = new Paciente(TEST_NOMBRE, TEST_EMAIL1,TEST_PASSWORD.getBytes(), TEST_DNI1, TEST_TIPOUSUARIO, TEST_CENTROASIGNADO, TEST_DOSIS1, TEST_LOCALIDAD, TEST_PROVINCIA);
 		userDAO.save(p);
 		userDAO.save(pError);
+		
+		citaPrueba = new Cita("2021-12-01","09:00",TEST_CENTROASIGNADO,TEST_DNI);
+		citaDAO.save(citaPrueba);
+		
+		cupo = new Cupo("2021-12-01","09:00",centro,10);
+		cupo2 = new Cupo("2021-12-22","09:00",centro,10);
+		cupoDAO.save(cupo);
+		cupoDAO.save(cupo2);
+	
+		listaCuposUsuario.add(cupo);
+		listaCuposUsuario.add(cupo2);
 	}
 
-	@Test 
+	@Test
 	@Order(1)
-	/***
-	 * Test añadir cita correctamente
-	 * @throws Exception
-	 */
-	void addCitaCorrecto() throws Exception {
+	void testSolicitarCitaCorrecto() {
 		JSONObject json = new JSONObject();
-		json.put("dni", TEST_DNI);
-		json.put("nombre", TEST_NOMBRE);
-		json.put("centroAsignado", TEST_CENTROASIGNADO);
-		System.out.println(json.toString());
-		
-		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.put("/cita/add")
-				.content(json.toString())
-				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().is(200));
+		json.put("email", TEST_EMAIL);
+		try {
+			when(userDAO.findByEmail(any())).thenReturn(p);
+			lenient().when(citaDAO.findByDniPaciente(p.getDni())).thenReturn(citaPrueba);
+			when(citaDAO.findAllByDniPaciente(p.getDni())).thenReturn(listaCitasUsuario);
+			when(cupoDAO.findAllByCentroSanitario(centro)).thenReturn(listaCuposUsuario);
+			mockMvc.perform(MockMvcRequestBuilders.post("cita/solicitarCita")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(json.toString()))
+					.andExpect(MockMvcResultMatchers.status().isOk());
+			//si no hay excepciones va bien
+			assertTrue(true);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	
@@ -115,15 +151,20 @@ class AddCitaApplicationTest {
 	 */
 	void addCitaIncorrecto() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("dni", TEST_DNI1);
-		json.put("nombre", TEST_NOMBRE);
-		json.put("centroAsignado", TEST_CENTROASIGNADO);
-		System.out.println(json.toString());
+		json.put("email", TEST_EMAIL);
 		
-		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.put("/cita/add")
-				.content(json.toString())
-				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().is(409));
+		try {
+			when(userDAO.findByEmail(any())).thenReturn(null);
+			lenient().when(citaDAO.findByDniPaciente(p.getDni())).thenReturn(citaPrueba);
+			
+			mockMvc.perform(MockMvcRequestBuilders.post("cita/solicitarCita")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(json.toString()));
+			//si no hay excepciones va bien
+
+		} catch (Exception e) {
+			assertEquals("El usuario no existe",e.getMessage());
+		}
 	}
 
 	

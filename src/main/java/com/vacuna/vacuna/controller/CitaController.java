@@ -39,12 +39,10 @@ import com.vacuna.vacuna.exception.UsuarioNoExisteException;
 import com.vacuna.vacuna.exception.VacunaException;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
+import com.vacuna.vacuna.model.Cupo;
+import com.vacuna.vacuna.model.FormatoVacunacion;
 import com.vacuna.vacuna.model.Paciente;
 import com.vacuna.vacuna.model.Usuario;
-
-import com.vacuna.vacuna.model.Cupo;
-
-import com.vacuna.vacuna.model.FormatoVacunacion;
 
 @RestController
 /***

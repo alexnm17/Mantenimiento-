@@ -70,7 +70,7 @@ class AddPacienteApplicationTest {
 	
 	@BeforeAll
 	public void setupTest() {
-		centro = new CentroSanitario(TEST_CENTROASIGNADO, 2000, 2, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro =  new CentroSanitario("Centro Prueba 1", 300, "Ciudad Real", "Ciudad Real");
 		DAO.save(centro);
 	}
 

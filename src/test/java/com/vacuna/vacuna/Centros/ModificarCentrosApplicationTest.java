@@ -53,7 +53,7 @@ class ModificarCentrosApplicationTest {
 	 
 	@BeforeAll
 	public void setUpTest() {
-		centro = new CentroSanitario("El Carmen", 2, 300, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro = new CentroSanitario("El Carmen", 300, "Ciudad Real", "Ciudad Real");
 		DAO.save(centro);
 	}
 
@@ -66,9 +66,6 @@ class ModificarCentrosApplicationTest {
 	 */
 	void modificarCentroCorrecto() throws Exception {
 		centro.setNombre("El Carmen");
-		centro.setAforo(2); 
-		centro.setHoraInicio(8);
-		centro.setHoraFin(20);
 		centro.setLocalidad("CR");
 		centro.setProvincia("CR");
 		centro.setDosisTotales(300);
@@ -77,9 +74,6 @@ class ModificarCentrosApplicationTest {
 		json.put("id", centro.getId());
 		json.put("nombre", centro.getNombre());
 		json.put("dosisTotales", centro.getDosisTotales());
-		json.put("aforo", centro.getAforo());
-		json.put("horaInicio", centro.getHoraInicio());
-		json.put("horaFin", centro.getHoraFin());
 		json.put("localidad", centro.getLocalidad());
 		json.put("provincia", centro.getProvincia());
 	
@@ -99,9 +93,6 @@ class ModificarCentrosApplicationTest {
 		json.put("id", centro.getId()); 
 		json.put("nombre", "");
 		json.put("dosisTotales", centro.getDosisTotales());
-		json.put("aforo", centro.getAforo());
-		json.put("horaInicio", centro.getHoraInicio());
-		json.put("horaFin", centro.getHoraFin());
 		json.put("localidad", centro.getLocalidad());
 		json.put("provincia", centro.getProvincia());
 	
