@@ -190,6 +190,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							typeAnimated: true,
 							buttons: {
 								Cerrar: function() {
+									app.router.go({ path: "gestionCentros" });
 								}
 							}
 						});
@@ -200,7 +201,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}
 				};
 				$.ajax(data);
-				this.gestionCentros();
 			}
 
 			modificarCentro(id) {
