@@ -66,6 +66,7 @@ public class UsuarioController {
 	@Autowired
 	private CentroSanitarioDAO csrepository;
 	
+	private static final String PACIENTE = "Paciente";
 	private String regexEmail = "^(.+)@(.+)(.+).(.+)$";
 	private String regex = "^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$";
 	
@@ -120,7 +121,7 @@ public class UsuarioController {
 		case "Administrador":
 			u = new Administrador(nombre, email, pwd, dni, tipoUsuario, centroAsignado);
 			break;
-		case "Paciente":
+		case PACIENTE:
 			if(!formValido(provincia, localidad)) {
 				throw new DatosIncompletosException();
 			}
@@ -197,7 +198,7 @@ public class UsuarioController {
 		if (repository.findByEmail(email).getTipoUsuario().equals("Administrador")) {
 			throw new UsuarioNoEliminadoException();
 		}
-		if (repository.findByEmail(email).getTipoUsuario().equals("Paciente")) {
+		if (repository.findByEmail(email).getTipoUsuario().equals(PACIENTE)) {
 			Paciente p = (Paciente) repository.findByEmail(email);
 			Cita c = repositoryCita.findByDniPaciente(p.getDni());
 			
@@ -354,7 +355,7 @@ public class UsuarioController {
 		try {
 			JSONObject jsonPaciente = new JSONObject(datosPaciente);
 			String dni = jsonPaciente.getString("dni");
-			Usuario usuarioVacunado = repository.findByDniAndTipoUsuario(dni, "Paciente");
+			Usuario usuarioVacunado = repository.findByDniAndTipoUsuario(dni, PACIENTE);
 			CentroSanitario centroVacunacion = repositoryCentro.findByNombre(usuarioVacunado.getCentroAsignado());
 
 			String fechaHoy = LocalDate.now().toString();

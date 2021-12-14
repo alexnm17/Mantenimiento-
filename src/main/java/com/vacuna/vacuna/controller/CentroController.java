@@ -49,8 +49,7 @@ public class CentroController {
 	 * @throws ControlHorasVacunacionException
 	 * @throws DatosIncompletosException
 	 */
-	public CentroSanitario add(@RequestBody Map<String, Object> info) throws ControlHorasVacunacionException, DatosIncompletosException {
-		System.out.println("hola");
+	public CentroSanitario add(@RequestBody Map<String, Object> info) throws DatosIncompletosException {
 		JSONObject jso = new JSONObject(info);
 		String nombre = jso.optString("nombre");
 		String dosisT = jso.optString("dosisTotales");
@@ -123,7 +122,7 @@ public class CentroController {
 	 */
 	public CentroSanitario modificarCentro(@PathVariable String id, 
 			@RequestBody Map<String, Object> info)
-			throws DatosIncompletosException, ControlHorasVacunacionException {
+			throws DatosIncompletosException {
 		Optional<CentroSanitario> optCentroSanitario = repository.findById(id);
 
 		JSONObject jso = new JSONObject(info);

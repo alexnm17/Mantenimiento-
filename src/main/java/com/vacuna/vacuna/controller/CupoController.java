@@ -33,7 +33,7 @@ public class CupoController {
 	@GetMapping("/getAllCuposDisponiblesPorFecha/{fecha}/{emailPaciente}")
 	public List<Cupo> getAllCuposConHuecoPorFecha(HttpSession session, @PathVariable("fecha") String fecha,
 			@PathVariable("emailPaciente") String emailPaciente) {
-		String emailUsuario = (String) session.getAttribute("userEmail");
+		String emailUsuario = emailPaciente;
 		Optional<Usuario> optUsuario = usuarioDao.findById(emailUsuario);
 		CentroSanitario centroSanitario = new CentroSanitario();
 		if (optUsuario.isPresent())
