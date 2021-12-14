@@ -68,6 +68,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			}
 
 			solicitarCita() {
+				alert("La petición de cita se está procesando. Espere para la resolución.")
+
 				let self = this;
 				let info = {
 					email: self.email,
@@ -217,7 +219,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				this.getCitas();
 				this.comprobarRol();
 			}
-			
+
 			comprobarRol() {
 				let self = this;
 				let data = {
