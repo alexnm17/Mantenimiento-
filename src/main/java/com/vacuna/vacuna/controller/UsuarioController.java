@@ -2,10 +2,7 @@ package com.vacuna.vacuna.controller;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +43,6 @@ import com.vacuna.vacuna.model.Paciente;
 import com.vacuna.vacuna.model.PersonalDeCitas;
 import com.vacuna.vacuna.model.Sanitario;
 import com.vacuna.vacuna.model.Usuario;
-
-import edu.esi.uclm.exceptions.SigevaException;
-import edu.esi.uclm.model.CentroVacunacion;
-import edu.esi.uclm.model.EstadoVacunacion;
 
 /***
  * 
@@ -146,28 +139,6 @@ public class UsuarioController {
 		repository.insert(u);
 
 	} 
-
-	
-	@PutMapping("/actualizarDosis")
-	/***
-	 * Metodo para actualizar las dosis de los pacientes
-	 * @param info
-	 */
-	public void actualizarDosis(@RequestBody Map<String, Object> info){
-		JSONObject jso = new JSONObject(info);
-		String dniPaciente = jso.optString("dniPaciente");
-		String primeraDosis = jso.optString("primeraDosis");
-		String segundaDosis = jso.optString("segundaDosis");
-		Paciente u = (Paciente) repository.findByDni(dniPaciente);
-		if(primeraDosis.equals("1")) {
-			u.setDosisAdministradas("1");
-		}
-		if(segundaDosis.equals("1")) {
-			u.setDosisAdministradas("2");
-		}
-		repository.save(u);
-	}
-
 	
 	@GetMapping("/getNombrePaciente/{dni}")
 	/***
@@ -180,33 +151,6 @@ public class UsuarioController {
 		return u.getNombre();	
 	}
 
-	
-	@GetMapping("/dosisMarcadas/{email}")
-	/***
-	 * Metodo para marcar las dosis de los pacientes
-	 * @param email
-	 * @return dosis
-	 */
-	public List<Integer> dosisMarcadas(@PathVariable String email){
-		Usuario sanitario = repository.findByEmail(email);
-		CentroSanitario cs = repositoryCentro.findByNombre(sanitario.getCentroAsignado());
-		List<Cita> citas = repositoryCita.findAllByNombreCentro(cs.getNombre());
-		List<Integer> dosis = new ArrayList<>();
-		for(int i= 0; i < citas.size(); i++) {	
-			Cita c =citas.get(i);
-			Paciente paciente = (Paciente) repository.findByDni(c.getDniPaciente());
-			String fecha = c.getFecha();
-			LocalDate today = LocalDate.now();
-		
-		    if(LocalDate.parse(fecha).isEqual(today)) {
-				dosis.add(Integer.parseInt(paciente.getDosisAdministradas()));
-			}
-			
-		}
-		return dosis;
-	}
-
-	
 	@GetMapping("/getTodos")
 	/***
 	 * Metodo para buscar los usuarios
@@ -220,7 +164,6 @@ public class UsuarioController {
 			throw new UsuariosNoEncontradosException();
 		}
 	}
-
 
 	@GetMapping("/getCentros")
 	/***
@@ -237,7 +180,6 @@ public class UsuarioController {
 		}
 
 	}
-
 
 	@Transactional
 	@DeleteMapping("/eliminarUsuario/{email}")
@@ -266,7 +208,6 @@ public class UsuarioController {
 		}
 		return repository.deleteByEmail(email);
 	}
-	
 	
 	@PostMapping("/modificarUsuarios")
 	/***
@@ -314,7 +255,6 @@ public class UsuarioController {
 		
 	}
 	
-	
 	@GetMapping("/buscarEmail/{email}")
 	/***
 	 * MEtodo para leer los usuarios
@@ -340,7 +280,6 @@ public class UsuarioController {
 		return u.getTipoUsuario();
 		
 	}
-
 
 	/***
 	 * Metodo que comprueba que los valores de una cadena son validos

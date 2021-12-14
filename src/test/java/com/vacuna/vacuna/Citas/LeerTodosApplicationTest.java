@@ -61,11 +61,11 @@ class LeerTodosApplicationTest {
 	
 	@BeforeAll
 	public void setupTest() {
-		centro = new CentroSanitario("Centro Cita 1", 2000, 2, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro = new CentroSanitario("Centro Cita 1", 2000, "Ciudad Real", "Ciudad Real");
 		centroDAO.save(centro);
 		p = new Paciente("Cristina eliminarCita", "eliminarcita@gmail.com","Hola1234=".getBytes(), "05724787H", "Paciente", "Centro Cita", "0", "CR", "CR");
 		DAO.save(p);
-		c = new Cita(1640471862, 1642286262, "Centro Cita", "05724787H", "Cristina eliminarCita");
+		c = new Cita("2021-12-01","09:00", "Centro Prueba Cita", "05724787H");
 		citaDAO.save(c);
 	}
 	

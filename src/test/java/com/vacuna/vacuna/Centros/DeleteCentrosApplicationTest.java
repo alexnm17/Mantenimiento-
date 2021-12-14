@@ -62,10 +62,10 @@ class DeleteCentrosApplicationTest {
 	 
 	@BeforeAll
 	void setUpTest() {
-		centro = new CentroSanitario("Centro Prueba 1", 2, 300, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro = new CentroSanitario("Centro Prueba 1", 300, "Ciudad Real", "Ciudad Real");
 		DAO.save(centro);
 		
-		centro1 = new CentroSanitario("Centro Prueba 2", 2, 300, 8, 20, "Ciudad Real", "Ciudad Real");
+		centro1 = new CentroSanitario("Centro Prueba 2", 300, "Ciudad Real", "Ciudad Real");
 		DAO.save(centro1);
 		
 		usuario = new  Usuario("usuarioPrueba","usuarioPruebaCentros@gmail.com","Hola1236=".getBytes(),"05724787H","Sanitario",centro1.getNombre());
