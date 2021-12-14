@@ -54,16 +54,13 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "get",
 					contentType: 'application/json',
 					success: function(response) {
-						for (let centro of response) {
+						for (let c of response) {
 							let centro = {
-								id: centro.id,
-								nombre: centro.nombre,
-								dosisTotales: centro.dosisTotales,
-								aforo: centro.aforo,
-								horaInicio: centro.horaInicio,
-								horaFin: centro.horaFin,
-								localidad: centro.localidad,
-								provincia: centro.provincia,
+								id: c.id,
+								nombre: c.nombre,
+								dosisTotales: c.dosisTotales,
+								localidad: c.localidad,
+								provincia: c.provincia,
 								eliminar: function() {
 									self.eliminarUsuario(centro.dni);
 								},
@@ -72,10 +69,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 									app.centro = this;
 									app.router.go({ path: "modificarCentro" });
 								},
-
 							};
-							self.horaInicio((centro.horaInicio < 10 ? "0" : "") + centro.horaInicio + ":00:00");
-							self.horaFin((centro.horaFin < 10 ? "0" : "") + centro.horaFin + ":00:00");
 						}
 					},
 					error: function(response) {
@@ -155,10 +149,11 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				$.ajax(data);
 			}
 
-			eliminarCitaCompleta(id) {
+
+			eliminarCita(id) {
 				let self = this;
 				let data = {
-					url: "cita/eliminarCitaCompleta/" + id,
+					url: "cita/anularCita/" + id,
 					type: "delete",
 					contentType: 'application/json',
 					success: function(response) {
@@ -173,7 +168,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 								}
 							}
 						});
-						//	self.getCitas();
 						self.getCitaPaciente();
 					},
 					error: function(response) {
@@ -193,7 +187,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					}
 				});
 			}
-
 			comprobarRol() {
 				let self = this;
 				let data = {
@@ -258,15 +251,11 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			}
 
 
-			modificarCita() {
+			modificarCita(idCita) {
+				localStorage.setItem("idCitaAModificar", idCita)
 				app.router.go({ path: "modificarCita" });
 			}
 
-			eliminarCita(id) {
-				app.idc = id;
-				app.cita = this;
-				app.router.go({ path: "eliminarCita" });
-			}
 
 			connected() {
 				accUtils.announce('Inicio page loaded.');

@@ -9,11 +9,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			self.nombreUsuario = ko.observable("");
 			self.email = ko.observable("");
 			self.dniPaciente = ko.observable("");
-			self.horaInicio = ko.observable("");
-			self.horaFin = ko.observable("");
 			self.dniPaciente2 = ko.observable("");
-			self.primeraDosis = ko.observable("");
-			self.segundaDosis = ko.observable("");
 			self.tipoUsuario = ko.observable("");
 			self.centroAsignado = ko.observable("");
 			self.fecha = ko.observable("");
@@ -48,8 +44,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					contentType : 'application/json',
 					success : function(response) {
 						self.citas(response);
-						console.log(self.citas());
-						
 					},
 					error : function(response) {
 						$.confirm({title: 'Error',content: response.responseJSON.message,type: 'red',typeAnimated: true,buttons: {tryAgain: {text: 'Cerrar',btnClass: 'btn-red',action: function(){}}}});
@@ -102,7 +96,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 						self.nombreUsuario(response[0]);
 						self.tipoUsuario(response[1]);
 						self.email(response[2]);
-						self.getCitas(response[2]);
 						self.centroAsignado(response[3]);
 					},
 					error: function(response) {
@@ -140,8 +133,6 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							},
 												
 						};
-						self.horaInicio((response[i].horaInicio < 10 ? "0":"")+response[i].horaInicio+":00:00");
-						self.horaFin((response[i].horaFin < 10 ? "0":"")+response[i].horaFin+":00:00");
 					}
 				},
 				error : function(response) {

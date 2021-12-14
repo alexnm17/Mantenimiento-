@@ -106,26 +106,6 @@ public class CitaController {
 		}
 	}
 
-
-	@Transactional
-	@DeleteMapping("/eliminarCita/{id}")
-	/***
-	 * Eliminamos solo una cita
-	 * 
-	 * @param id
-	 * @param info
-	 * @return cita eliminada
-	 * @throws ParseException
-	 */
-	public void eliminarCita(@PathVariable String id){
-		Optional<Cita> c = repositoryCita.findById(id);
-		if (c.isPresent()) {
-			repositoryCita.deleteById(id);
-		}
-		else throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No se ha encontrado la cita a eliminar. Por favor contacte con un administrador");
-		
-	}
-
 	@DeleteMapping("/anularCita/{id}")
 	public void anularCita(HttpSession session, @PathVariable String id) {
 		try {
@@ -288,6 +268,23 @@ public class CitaController {
 
 	}
 
+	@GetMapping("/getCitasHoy/{email}")
+	public List<Cita> getCitasHoy(@PathVariable("email") String email) {
+		String fecha = LocalDate.now().toString();
+		return getCitasPorDia(fecha, email);
+	}
+	
+	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
+	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
+			@PathVariable("fecha") String fecha) {
+		return getCitasPorDia(fecha, email);
+	}
+
+	public List<Cita> getCitasPorDia(String fecha, String email) {
+		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByEmail(email).getCentroAsignado(),
+				fecha);
+	}
+
 	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario CentroSanitario) {
 		Cupo cupo = null;
 
@@ -319,17 +316,6 @@ public class CitaController {
 				usuario.getDni());
 		repositoryCita.save(cita);
 
-	}
-
-	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
-	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
-			@PathVariable("fecha") String fecha) {
-		return getCitasPorDia(fecha, email);
-	}
-
-	public List<Cita> getCitasPorDia(String fecha, String email) {
-		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByEmail(email).getCentroAsignado(),
-				fecha);
 	}
 
 	@PostMapping("/modificarCita")
