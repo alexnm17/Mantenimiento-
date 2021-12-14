@@ -163,7 +163,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 			comprobarRol() {	
 				let self = this;
 				let data = {
-					url: "login/comprobarRolPaciente",
+					url: "login/comprobarRolPersonalDeCitasAndPaciente",
 					type: "get",
 					contentType: 'application/json',
 					success: function(response) {
