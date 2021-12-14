@@ -122,8 +122,7 @@ public class CentroController {
 	 */
 	public CentroSanitario modificarCentro(@PathVariable String id, 
 			@RequestBody Map<String, Object> info)
-			throws DatosIncompletosException {
-		Optional<CentroSanitario> optCentroSanitario = repository.findById(id);
+			throws DatosIncompletosException, CentroNoExisteException {
 
 		JSONObject jso = new JSONObject(info);
 		String nombre = jso.optString("nombre");
@@ -131,23 +130,24 @@ public class CentroController {
 		String localidad = jso.optString("localidad");
 		String provincia = jso.optString("provincia");
 		
+		CentroSanitario centroSanitario = repository.findByNombre(nombre);
+
 		if(!formValido(nombre, dosisT, localidad, provincia)) {
 			throw new DatosIncompletosException();
 		}
 		
 		int dosisTotales = Integer.parseInt(dosisT);
 		
-		CentroSanitario centro = new CentroSanitario();
-		if (optCentroSanitario.isPresent()) {
-			centro = optCentroSanitario.get();
+		if (centroSanitario==null) {
+			throw new CentroNoExisteException();
 		}
 	
-		centro.setNombre(nombre);
-		centro.setLocalidad(localidad);
-		centro.setProvincia(provincia);
-		centro.setDosisTotales(dosisTotales);
+		centroSanitario.setNombre(nombre);
+		centroSanitario.setLocalidad(localidad);
+		centroSanitario.setProvincia(provincia);
+		centroSanitario.setDosisTotales(dosisTotales);
 
-		return repository.save(centro);
+		return repository.save(centroSanitario);
 	}
 
 	@Transactional

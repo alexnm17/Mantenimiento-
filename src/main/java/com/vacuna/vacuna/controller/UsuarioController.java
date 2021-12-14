@@ -200,12 +200,16 @@ public class UsuarioController {
 		}
 		if (repository.findByEmail(email).getTipoUsuario().equals(PACIENTE)) {
 			Paciente p = (Paciente) repository.findByEmail(email);
-			Cita c = repositoryCita.findByDniPaciente(p.getDni());
+			List<Cita> c = repositoryCita.findAllByDniPaciente(p.getDni());
 			
 			if(!p.getDosisAdministradas().equals("0")) {
 				throw new UsuarioNoEliminadoException();
 			}
-			repositoryCita.deleteById(c.getId());
+			
+			for(Cita cita: c) {
+				repositoryCita.deleteById(cita.getId());
+			}
+			
 		}
 		return repository.deleteByEmail(email);
 	}
