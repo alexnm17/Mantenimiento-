@@ -150,7 +150,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					dosisAdministradas: this.dosisAdministradas(),
 					localidad: this.localidad(),
 					provincia: this.provincia(),
-					
+
 				};
 				let data = {
 					data: JSON.stringify(info),
@@ -168,16 +168,15 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 								Cerrar: function() {
 								}
 							}
-						});
 
+						});
+						this.gestionUsuarios();
 					},
 					error: function(response) {
 						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });
-
 					}
 				};
 				$.ajax(data);
-				this.gestionUsuarios();
 			}
 
 			getUserConnect() {
@@ -199,6 +198,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				$.ajax(data);
 			}
 			
+			gestionUsuarios() {
+				app.router.go({ path: "gestionUsuarios" });
+			}
+
 			connected() {
 				accUtils.announce('Inicio page loaded.');
 				document.title = "Crear Usuario";
