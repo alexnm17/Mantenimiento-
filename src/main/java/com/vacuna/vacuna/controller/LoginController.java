@@ -155,7 +155,6 @@ public class LoginController {
 		try {
 			String email = (String) request.getSession().getAttribute(userEmail);
 			Usuario u = userRepository.findByEmail(email);
-			System.out.println(u.getTipoUsuario());
 			if(u == null || !u.getTipoUsuario().equalsIgnoreCase("Personal de Citas")) {
 				return denegado;
 			}
