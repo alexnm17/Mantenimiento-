@@ -110,6 +110,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 			logout() {
 				localStorage.clear();
+				app.router.go({ path: "login" });
 			}
 
 			eliminarCentro(id) {
