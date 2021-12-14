@@ -105,18 +105,18 @@ public class CitaController {
 	}
 
 	@DeleteMapping("/anularCita/{id}")
-	public void anularCita(HttpSession session, @PathVariable String id) {
+	public void anularCita(HttpSession session, @PathVariable String id) throws VacunaException {
 		try {
 			Optional<Cita> optCita = repositoryCita.findById(id);
 			Cita cita = null;
 			if (optCita.isPresent()) {
 				cita = optCita.get();
 			} else {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe la cita que intenta anular.");
+				throw new CitasNoEncontradasException ();
 			}
 
 			if (cita.isUsada())
-				throw new ResponseStatusException(HttpStatus.CONFLICT,
+				throw new VacunaException(HttpStatus.CONFLICT,
 						"La cita que intenta anular ya ha sido utilizada.");
 
 			CentroSanitario centroSanitario = repositoryCentro.findByNombre(cita.getNombreCentro());
@@ -128,7 +128,7 @@ public class CitaController {
 			repositoryCita.deleteById(id);
 			repositoryCupo.save(cupo);
 		} catch (ResponseStatusException e) {
-			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+			throw new VacunaException(e.getStatus(), e.getMessage());
 		}
 	}
 
@@ -217,8 +217,9 @@ public class CitaController {
 	 * @throws NoHayDosisException
 	 */
 	@PostMapping("/solicitarCita")
-	public void solicitarCita(@RequestBody Map<String, Object> info)
+	public void solicitarCita(@RequestBody Map<String, Object> info, HttpSession session)
 			throws UsuarioNoExisteException, CupoNoEncontradoException {
+	
 		JSONObject json = new JSONObject(info);
 		String email = json.getString("email");
 		try {
@@ -316,7 +317,7 @@ public class CitaController {
 	}
 
 	@PostMapping("/modificarCita")
-	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) {
+	public void modificarCita(HttpSession session, @RequestBody Map<String, Object> datosCita) throws VacunaException {
 		try {
 			JSONObject json = new JSONObject(datosCita);
 			String idCita = json.getString("idCita");
@@ -336,15 +337,15 @@ public class CitaController {
 			int citasAsignadas = listaCitas.size();
 
 			if (citasAsignadas < 1)
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+				throw new VacunaException(HttpStatus.NOT_FOUND,
 						"No se puede modificar citas puesto que no dispone de ninguna cita asignada");
 
 			if (cupoElegido.getPersonasRestantes() < 1)
-				throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+				throw new VacunaException(HttpStatus.FORBIDDEN,
 						"No hay hueco para cita el dia " + cupoElegido.getFecha() + " a las " + cupoElegido.getHora());
 
 			if (citaModificar.isUsada())
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+				throw new VacunaException(HttpStatus.NOT_FOUND,
 						"No se puede modificar su cita puesto que ya está vacunado");
 
 			if (listaCitas.size() == 2) {
@@ -359,13 +360,13 @@ public class CitaController {
 					if (LocalDate.parse(cupoElegido.getFecha()).isAfter(LocalDate.parse(listaCitas.get(1).getFecha()))
 							|| LocalDate.parse(cupoElegido.getFecha())
 									.isEqual(LocalDate.parse(listaCitas.get(1).getFecha())))
-						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+						throw new VacunaException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
 								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
 					break;
 				case 1:
 					if (LocalDate.parse(cupoElegido.getFecha())
 							.isBefore(LocalDate.parse(listaCitas.get(0).getFecha()).plusDays(21)))
-						throw new ResponseStatusException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+						throw new VacunaException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
 								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
 					break;
 				default:
@@ -381,9 +382,9 @@ public class CitaController {
 
 		} catch (ResponseStatusException e) {
 			if (e.getStatus() == HttpStatus.FORBIDDEN) {
-				throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+				throw new VacunaException(HttpStatus.FORBIDDEN, e.getMessage());
 			} else if (e.getStatus() == HttpStatus.NOT_FOUND) {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+				throw new VacunaException(HttpStatus.NOT_FOUND, e.getMessage());
 			}
 		}
 	}

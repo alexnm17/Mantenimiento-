@@ -1,4 +1,5 @@
 
+
 define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 	'jquery'], function(ko, app, moduleUtils, accUtils, $) {
 
@@ -151,6 +152,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type: "post",
 					contentType: 'application/json',
 					success: function(response) {
+						localStorage.clear();
 						app.router.go({ path: "login" });
 					},
 					error: function(response) {

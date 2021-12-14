@@ -3,10 +3,12 @@ package com.vacuna.vacuna.controller;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,7 @@ public class LoginController {
 	@Autowired 
 	private UsuarioDAO userRepository;
 	 
-	private String userEmail = "userEmail";   
+	private String userEmail = "emailUsuario";   
 	private String pacient= "Paciente";  
 	private String denegado = "denegado";  
 	private String aprobado = "aprobado";  
@@ -153,7 +155,28 @@ public class LoginController {
 		try {
 			String email = (String) request.getSession().getAttribute(userEmail);
 			Usuario u = userRepository.findByEmail(email);
+			System.out.println(u.getTipoUsuario());
 			if(u == null || !u.getTipoUsuario().equalsIgnoreCase("Personal de Citas")) {
+				return denegado;
+			}
+		} catch (Exception e) {
+			throw new FalloRolUsuarioException();
+		}
+		return aprobado;
+	}
+	
+	@GetMapping("/comprobarRolPersonalDeCitasAndPaciente")
+	/***
+	 * Comprobamos que el usuario que inicia sesion es personal de citas
+	 * @param request
+	 * @return rol personalDeCitas
+	 * @throws FalloRolUsuarioException
+	 */
+	public @ResponseBody String comprobarRolPersonalDeCitasAndPaciente(HttpServletRequest request) throws FalloRolUsuarioException {
+		try {
+			String email = (String) request.getSession().getAttribute(userEmail);
+			Usuario u = userRepository.findByEmail(email);
+			if(u == null || (!u.getTipoUsuario().equalsIgnoreCase("Personal de Citas") && !u.getTipoUsuario().equalsIgnoreCase(pacient))) {
 				return denegado;
 			}
 		} catch (Exception e) {
@@ -199,10 +222,19 @@ public class LoginController {
 	 */
 	public void logout(HttpServletRequest request) throws LogoutException {
 		try {
-			request.getSession().removeAttribute(userEmail);
+				
+			HttpSession session = request.getSession();
+			Enumeration<String> attributes = session.getAttributeNames();
+
+			while (attributes.hasMoreElements()) {
+				String attr = attributes.nextElement();
+				session.removeAttribute(attr);	
+			}
+		
 		} catch (Exception e) {
 			throw new LogoutException();
 		}
+		
 	}
 	
 	

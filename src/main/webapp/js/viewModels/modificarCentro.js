@@ -97,6 +97,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					type : "post",
 					contentType : 'application/json',
 					success : function(response) {
+						localStorage.clear();
 						app.router.go( { path : "login" } );
 					},
 					error : function(response) {
@@ -150,6 +151,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		connected() {
 			accUtils.announce('Inicio page loaded.');
 			document.title = "Inicio";
+			this.comprobarRol();
 			this.getUserConnect();
 		};
 
