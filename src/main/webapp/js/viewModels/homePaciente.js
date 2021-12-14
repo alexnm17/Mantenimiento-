@@ -256,6 +256,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				localStorage.setItem("idCitaAModificar", idCita)
 				localStorage.setItem("dniUsuarioAAdministrar", dniPaciente)
 				localStorage.setItem("emailUsuarioAAdministrar", localStorage.getItem("emailUsuario"))
+
 				app.router.go({ path: "modificarCita" });
 			}
 
