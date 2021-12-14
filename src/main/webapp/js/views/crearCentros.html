@@ -86,7 +86,7 @@
 
 				<label>Provincia</label>
 				<input type="text" data-bind="value : provincia" placeholder="Provincia">
-				<oj-button chroming="callToAction" class="oj-button-sm" data-bind="click : add" style="margin-top:3px;">
+				<oj-button chroming="callToAction" class="oj-button-sm" data-bind="click : add; gestionCentros;" style="margin-top:3px;">
 					Guardar Centro Santario</oj-button>
 			</form>
 		</div>
@@ -126,6 +126,13 @@
 					dropdownContent.style.display = "block";
 				}
 			});
+		}
+		
+		function clear(){
+			document.getElementsByName("nombre").clear;
+			document.getElementsByName("dosis totales").clear;
+			document.getElementsByName("localidad").clear;
+			document.getElementsByName("provincia").clear;
 		}
 	</script>
 
