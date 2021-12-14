@@ -13,11 +13,11 @@
 		<header>
 			<div class="topnav w3-red">
 				<div class="logoinicial">
-					<a> <img src="img/SIGEVA_LOGO_menu.png" style="width:80%"></a>
+					<a> <img src="img/SIGEVA_LOGO_menu.png" style="width:80%" alt="menu"></a>
 				</div>
 
 				<div class="avatar dropdown" style="float:right;">
-					<button class="dropbtn w3-red"><img src="img/men.jpg" /></button>
+					<button class="dropbtn w3-red"><img src="img/men.jpg" alt="dropdown"/></button>
 					<div class="dropdown-content">
 						<a data-bind="click : logout">Cerrar sesion</a>
 
@@ -58,31 +58,35 @@
 
 
 
-			<h1 class="w3-jumbo" data-bind="html : centroAsignado" style="text-align:center;"><b></b></h1>
-			<h3 style="text-align:center;"><b>Hoy es <span data-bind="html : fecha"></span></b></h3>
-			<h3 style="text-align:center;"><b>TUS CITAS</b></h3>
+			<h1 class="w3-jumbo" data-bind="html : centroAsignado" style="text-align:center;"></h1>
+			<h3 style="text-align:center;"><strong>Hoy es <span data-bind="html : fecha"></span></strong></h3>
+			<h3 style="text-align:center;"><strong>TUS CITAS</strong>ts</h3>
 
 		</div>
 
 		<div data-bind="visible : tablaCita()==1" style="margin-top:20px">
 			<table class="w3-table-all w3-centered">
+				<caption></caption>
 				<tr class="w3-red">
-					<th>Centro Asignado</th>
-					<th>Fecha</th>
-					<th>Hora</th>
-					<th>Modificar</th>
-					<th>Anular</th>
+					<th id="headCentro">Centro Asignado</th >
+					<th id="headFecha">Fecha</th >
+					<th id="headHora">Hora</th >
+					<th id="headModificar">Modificar</th >
+					<th id="headAnular">Anular</th >
 				</tr>
 				<!-- ko foreach : citas -->
 				<tr>
 					<td data-bind="html : nombreCentro"></td>
 					<td data-bind="html : fecha"></td>
-					<td data-bind="html : hora"></td >
-					<td><img data-bind="click : function() { $parent.modificarCita(id, dniPaciente); }" class="iconoImg" src="css/modify.png">
-					
+
+					<td data-bind="html : hora"></td>
+					<td><img data-bind="click : function() { $parent.modificarCita(id, dniPaciente); }" class="iconoImg"
+							src="css/modify.png" alt="icono Modificar">
+
 					</td>
-					<td><img data-bind="click : function() { $parent.eliminarCita(id); }" class="iconoImg" src="css/delete.png">
-					
+					<td><img data-bind="click : function() { $parent.eliminarCita(id); }" class="iconoImg"
+							src="css/delete.png" alt="icono Borrar">
+
 					</td>
 
 				</tr>
