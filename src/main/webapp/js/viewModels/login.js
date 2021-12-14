@@ -6,8 +6,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		constructor() {
 			var self = this;
 			
-			self.email = ko.observable("jaime@sigeva.com");
-			self.password = ko.observable("Jj=123456");
+			self.email = ko.observable("");
+			self.password = ko.observable("");
 			self.dni = ko.observable("");		
 			
 			self.message = ko.observable();

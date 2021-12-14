@@ -190,10 +190,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 							typeAnimated: true,
 							buttons: {
 								Cerrar: function() {
+									app.router.go({ path: "gestionCentros" });
 								}
 							}
 						});
-						self.getCentros();
 					},
 					error: function(response) {
 						$.confirm({ title: 'Error', content: response.responseJSON.message, type: 'red', typeAnimated: true, buttons: { tryAgain: { text: 'Cerrar', btnClass: 'btn-red', action: function() { } } } });

@@ -84,8 +84,8 @@
 						<th>Centro Asignado</th>
 						<th>Localidad</th>
 						<th>Provincia</th>
-						<th>Eliminar</th>
 						<th>Modificar</th>
+						<th>Eliminar</th>
 					</tr>
 					<!-- ko foreach : usuarios -->
 					<tr>
@@ -98,10 +98,11 @@
 						<td data-bind="html : localidad"></td>
 						<td data-bind="html : provincia"></td>
 
-						<td><img data-bind="click : function() { $parent.eliminarUsuario(email); }" class="iconoImg"
-								src="css/delete.png" style="width:20%"></td>
 						<td><img data-bind="click : modificarUsuarios" class="iconoImg" src="css/modify.png"
-								style="width:20%"></td>
+								style="width:20%" alt="IconoModificar"></td>
+						<td><img data-bind="click : function() { $parent.eliminarUsuario(email); }" class="iconoImg"
+								src="css/delete.png" style="width:20%" alt="IconoEliminar"></td>
+
 					</tr>
 					<!-- /ko -->
 				</table>
