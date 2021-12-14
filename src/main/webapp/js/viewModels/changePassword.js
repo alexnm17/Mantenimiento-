@@ -51,19 +51,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		
 		
 		logout() {
-			let self = this;
-			let data = {
-				url : "login/logout",
-				type : "post",
-				contentType : 'application/json',
-				success : function(response) {
-					localStorage.clear();
-					app.router.go( { path : "login" } );
-				},
-				error : function(response) {
-				}
-			};
-			$.ajax(data);
+			localStorage.clear();
 		}
 		
 		cambiarPassword() {
