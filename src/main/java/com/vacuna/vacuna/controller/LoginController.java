@@ -211,31 +211,6 @@ public class LoginController {
 		return user;
 	}
 
-
-	
-	@PostMapping("/logout")
-	/***
-	 * Cerrar sesion
-	 * @param request
-	 * @throws LogoutException
-	 */
-	public void logout(HttpServletRequest request) throws LogoutException {
-		try {
-				
-			HttpSession session = request.getSession();
-			Enumeration<String> attributes = session.getAttributeNames();
-
-			while (attributes.hasMoreElements()) {
-				String attr = attributes.nextElement();
-				session.removeAttribute(attr);	
-			}
-		
-		} catch (Exception e) {
-			throw new LogoutException();
-		}
-		
-	}
-	
 	
 	@GetMapping("/primerInicio")
 	/***

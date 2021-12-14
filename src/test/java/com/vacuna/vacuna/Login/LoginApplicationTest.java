@@ -118,12 +118,12 @@ class LoginApplicationTest {
 	 */
 	void expectedErrorCredencialesInvalidas() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("email", TEST_EMAIL);
+		json.put("emailUsuario", TEST_EMAIL);
 		json.put("password", "Hola");
 		System.out.println(json.toJSONString());		
 		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.post("/login/login")
 				.content(json.toString())
-				.sessionAttr("userEmail", TEST_EMAIL)
+				.sessionAttr("emailUsuario", TEST_EMAIL)
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().is(409));
 	}
@@ -135,11 +135,10 @@ class LoginApplicationTest {
 	 */
 	void comprobarRolSanitarioCorrecto() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("email", TEST_EMAIL);
-		System.out.println(json.toJSONString());		
+		json.put("emailUsuario", TEST_EMAIL);	
 		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.get("/login/comprobarRolSanitario")
 				.content(json.toString())
-				.sessionAttr("userEmail", TEST_EMAIL)
+				.sessionAttr("emailUsuario", TEST_EMAIL)
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().string(("aprobado")));
 	}
@@ -151,12 +150,11 @@ class LoginApplicationTest {
 	 */
 	void comprobarRolAdminCorrecto() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("email", TEST_EMAIL1);
-		json.put("tipoUsuario", TEST_TIPOUSUARIO1);
-		System.out.println(json.toJSONString());		
+		json.put("emailUsuario", TEST_EMAIL1);
+		json.put("tipoUsuario", TEST_TIPOUSUARIO1);	
 		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.get("/login/comprobarRolAdmin")
 				.content(json.toString())
-				.sessionAttr("userEmail", TEST_EMAIL1)
+				.sessionAttr("emailUsuario", TEST_EMAIL1)
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().string(("aprobado")));
 	}
@@ -169,11 +167,10 @@ class LoginApplicationTest {
 	 */
 	void comprobarRolPacienteCorrecto() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("email", TEST_EMAIL2);
-		System.out.println(json.toJSONString());		
+		json.put("emailUsuario", TEST_EMAIL2);	
 		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.get("/login/comprobarRolPaciente")
 				.content(json.toString())
-				.sessionAttr("userEmail", TEST_EMAIL2)
+				.sessionAttr("emailUsuario", TEST_EMAIL2)
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().string(("aprobado")));
 	}
@@ -185,11 +182,10 @@ class LoginApplicationTest {
 	 */
 	void comprobarRolSanitarioIncorrecto() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("email", "pruebFallo@gmail.com");
-		System.out.println(json.toJSONString());		
+		json.put("emailUsuario", "pruebFallo@gmail.com");
 		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.get("/login/comprobarRolSanitario")
 				.content(json.toString())
-				.sessionAttr("userEmail", "pruebFallo@gmail.com")
+				.sessionAttr("emailUsuario", "pruebFallo@gmail.com")
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(content().string(("denegado")));
 	}
@@ -254,13 +250,13 @@ class LoginApplicationTest {
 	 */
 	void cambioPasswordCorrecto() throws Exception {
 		JSONObject json = new JSONObject();
-		json.put("email", TEST_EMAIL);
+		json.put("emailUsuario", TEST_EMAIL);
 		json.put("password", "Hola1234567=");
 		json.put("password2", "Hola1234567=");
 		System.out.println(json.toJSONString());		
 		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.post("/login/cambiarPassword")
 				.content(json.toString())
-				.sessionAttr("userEmail", TEST_EMAIL)
+				.sessionAttr("emailUsuario", TEST_EMAIL)
 				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().is(200));
 	}
