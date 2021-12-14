@@ -112,16 +112,15 @@ public class CitaController {
 			if (optCita.isPresent()) {
 				cita = optCita.get();
 			} else {
-				throw new CitasNoEncontradasException ();
+				throw new CitasNoEncontradasException();
 			}
 
 			if (cita.isUsada())
-				throw new VacunaException(HttpStatus.CONFLICT,
-						"La cita que intenta anular ya ha sido utilizada.");
+				throw new VacunaException(HttpStatus.CONFLICT, "La cita que intenta anular ya ha sido utilizada.");
 
-			CentroSanitario centroSanitario = repositoryCentro.findByNombre(cita.getNombreCentro());
+			CentroSanitario centroSanitarioAnular = repositoryCentro.findByNombre(cita.getNombreCentro());
 
-			Cupo cupo = repositoryCupo.findAllByCentroSanitarioAndFechaAndHora(centroSanitario, cita.getFecha(),
+			Cupo cupo = repositoryCupo.findAllByCentroSanitarioAndFechaAndHora(centroSanitarioAnular, cita.getFecha(),
 					cita.getHora());
 			cupo.setPersonasRestantes(cupo.getPersonasRestantes() + 1);
 
@@ -146,11 +145,8 @@ public class CitaController {
 	@GetMapping("/getCitaPorDia/{fecha}")
 	public List<Cita> getCitasPorDia(HttpSession session, @PathVariable String fecha) {
 		String email = (String) session.getAttribute("email");
-
-		List<Cita> citas = repositoryCita
-				.findAllByNombreCentroAndFecha(repositoryUsuario.findByDni(email).getCentroAsignado(), fecha);
-
-		return citas;
+		return repositoryCita.findAllByNombreCentroAndFecha(repositoryUsuario.findByDni(email).getCentroAsignado(),
+				fecha);
 	}
 
 	@GetMapping("/getCitasPaciente/{dni}")
@@ -219,7 +215,7 @@ public class CitaController {
 	@PostMapping("/solicitarCita")
 	public void solicitarCita(@RequestBody Map<String, Object> info, HttpSession session)
 			throws UsuarioNoExisteException, CupoNoEncontradoException {
-	
+
 		JSONObject json = new JSONObject(info);
 		String email = json.getString("email");
 		try {
@@ -271,7 +267,7 @@ public class CitaController {
 		String fecha = LocalDate.now().toString();
 		return getCitasPorDia(fecha, email);
 	}
-	
+
 	@GetMapping("/getCitasOtroDia/{email}/{fecha}")
 	public List<Cita> getCitasOtroDia(HttpServletRequest session, @PathVariable("email") String email,
 			@PathVariable("fecha") String fecha) {
@@ -283,11 +279,11 @@ public class CitaController {
 				fecha);
 	}
 
-	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario CentroSanitario) {
+	private Cupo buscarCupoLibre(LocalDate fechaActualDate, CentroSanitario centroSanitario) {
 		Cupo cupo = null;
 
 		// Para poder coger siempre la primera con un hueco libre por fecha
-		List<Cupo> listaCupos = repositoryCupo.findAllByCentroSanitario(CentroSanitario);
+		List<Cupo> listaCupos = repositoryCupo.findAllByCentroSanitario(centroSanitario);
 		listaCupos.sort(Comparator.comparing(Cupo::getFecha));
 
 		for (int i = 0; i < listaCupos.size(); i++) {
@@ -325,7 +321,12 @@ public class CitaController {
 			String dniPaciente = json.getString("dniPaciente");
 
 			Optional<Cita> citaaModificar = repositoryCita.findById(idCita);
-			Cita citaModificar = citaaModificar.get();
+			Cita citaModificar;
+			if (citaaModificar.isPresent()) {
+				citaModificar = citaaModificar.get();
+			} else {
+				throw new VacunaException(HttpStatus.PRECONDITION_FAILED, "No se ha encontrado ninguna cita");
+			}
 			Optional<Cupo> optCupoElegido = repositoryCupo.findById(idCupo);
 			Cupo cupoElegido = new Cupo();
 
@@ -336,17 +337,11 @@ public class CitaController {
 			listaCitas.sort(Comparator.comparing(Cita::getFecha));
 			int citasAsignadas = listaCitas.size();
 
-			if (citasAsignadas < 1)
-				throw new VacunaException(HttpStatus.NOT_FOUND,
-						"No se puede modificar citas puesto que no dispone de ninguna cita asignada");
+			checkTieneCitasAsignadas(citasAsignadas);
 
-			if (cupoElegido.getPersonasRestantes() < 1)
-				throw new VacunaException(HttpStatus.FORBIDDEN,
-						"No hay hueco para cita el dia " + cupoElegido.getFecha() + " a las " + cupoElegido.getHora());
+			checkCupoTieneHueco(cupoElegido);
 
-			if (citaModificar.isUsada())
-				throw new VacunaException(HttpStatus.NOT_FOUND,
-						"No se puede modificar su cita puesto que ya está vacunado");
+			checkUsuarioVacunado(citaModificar);
 
 			if (listaCitas.size() == 2) {
 				int indiceCita = -1;
@@ -357,17 +352,10 @@ public class CitaController {
 
 				switch (indiceCita) {
 				case 0:
-					if (LocalDate.parse(cupoElegido.getFecha()).isAfter(LocalDate.parse(listaCitas.get(1).getFecha()))
-							|| LocalDate.parse(cupoElegido.getFecha())
-									.isEqual(LocalDate.parse(listaCitas.get(1).getFecha())))
-						throw new VacunaException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
-								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+					checkSegundaCitaPosteriorAPrimera(cupoElegido, listaCitas);
 					break;
 				case 1:
-					if (LocalDate.parse(cupoElegido.getFecha())
-							.isBefore(LocalDate.parse(listaCitas.get(0).getFecha()).plusDays(21)))
-						throw new VacunaException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
-								"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+					checkDatePosterior(cupoElegido, listaCitas);
 					break;
 				default:
 					break;
@@ -387,6 +375,39 @@ public class CitaController {
 				throw new VacunaException(HttpStatus.NOT_FOUND, e.getMessage());
 			}
 		}
+	}
+
+	private void checkSegundaCitaPosteriorAPrimera(Cupo cupoElegido, List<Cita> listaCitas) throws VacunaException {
+		if (LocalDate.parse(cupoElegido.getFecha()).isAfter(LocalDate.parse(listaCitas.get(1).getFecha()))
+				|| LocalDate.parse(cupoElegido.getFecha())
+						.isEqual(LocalDate.parse(listaCitas.get(1).getFecha())))
+			throw new VacunaException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+					"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
+	}
+
+	private void checkTieneCitasAsignadas(int citasAsignadas) throws VacunaException {
+		if (citasAsignadas < 1)
+			throw new VacunaException(HttpStatus.NOT_FOUND,
+					"No se puede modificar citas puesto que no dispone de ninguna cita asignada");
+	}
+
+	private void checkCupoTieneHueco(Cupo cupoElegido) throws VacunaException {
+		if (cupoElegido.getPersonasRestantes() < 1)
+			throw new VacunaException(HttpStatus.FORBIDDEN,
+					"No hay hueco para cita el dia " + cupoElegido.getFecha() + " a las " + cupoElegido.getHora());
+	}
+
+	private void checkUsuarioVacunado(Cita citaModificar) throws VacunaException {
+		if (citaModificar.isUsada())
+			throw new VacunaException(HttpStatus.NOT_FOUND,
+					"No se puede modificar su cita puesto que ya está vacunado");
+	}
+
+	private void checkDatePosterior(Cupo cupoElegido, List<Cita> listaCitas) throws VacunaException {
+		if (LocalDate.parse(cupoElegido.getFecha())
+				.isBefore(LocalDate.parse(listaCitas.get(0).getFecha()).plusDays(21)))
+			throw new VacunaException(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+					"No se puede poner la primera cita el mismo dia o un dia posterior a la primera");
 	}
 
 }
