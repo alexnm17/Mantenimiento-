@@ -1,16 +1,13 @@
 package com.vacuna.vacuna.Citas;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -29,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,6 +40,7 @@ import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
 import com.vacuna.vacuna.model.Cupo;
 import com.vacuna.vacuna.model.Paciente;
+import com.vacuna.vacuna.model.Usuario;
 
 /***
  * 
@@ -72,13 +69,14 @@ class AddCitaApplicationTest {
 	private CitaDAO citaDAO;
 	@Autowired
 	private CupoDAO cupoDAO;
+	
+	
+	
 	private Cupo cupo;
 	private Cupo cupo2;
 	private List<Cita> listaCitasUsuario = new ArrayList<Cita>();
 	private List<Cupo> listaCuposUsuario = new ArrayList<Cupo>();
 	private Cita citaPrueba;
-
-	
 	private CentroSanitario centro;
 	private String TEST_NOMBRE = "Cristina Paciente";
 	private String TEST_EMAIL = "pruebaCita@gmail.com";
@@ -152,18 +150,39 @@ class AddCitaApplicationTest {
 	void addCitaIncorrecto() throws Exception {
 		JSONObject json = new JSONObject();
 		json.put("email", TEST_EMAIL);
-		
 		try {
 			when(userDAO.findByEmail(any())).thenReturn(null);
 			lenient().when(citaDAO.findByDniPaciente(p.getDni())).thenReturn(citaPrueba);
-			
+			when(citaDAO.findAllByDniPaciente(p.getDni())).thenReturn(listaCitasUsuario);
+			when(cupoDAO.findAllByCentroSanitario(centro)).thenReturn(listaCuposUsuario);
 			mockMvc.perform(MockMvcRequestBuilders.post("cita/solicitarCita")
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(json.toString()));
+					.content(json.toString()))
+					.andExpect(MockMvcResultMatchers.status().isOk());
 			//si no hay excepciones va bien
+			assertTrue(true);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	
+	}
+	
+	@Test
+	void testGetCitasHoy() throws Exception{
+		List<Cita> citasHoy = new ArrayList();
+		Usuario usuario = new Usuario("Paco", TEST_EMAIL, null, "23242342342Q", "Paciente", TEST_CENTROASIGNADO);
+		
+		try {
+			when(userDAO.findByEmail(any())).thenReturn(usuario);
+			lenient().when(citaDAO.findAllByNombreCentroAndFecha(anyString(),anyString())).thenReturn(citasHoy);
+			mockMvc.perform(MockMvcRequestBuilders.get("/getCitasHoy")
+					.param("email",TEST_EMAIL))
+					.andExpect(MockMvcResultMatchers.status().isOk());
+			//si no hay excepciones va bien
+			assertTrue(true);
 
 		} catch (Exception e) {
-			assertEquals("El usuario no existe",e.getMessage());
+			System.out.println(e.getMessage());
 		}
 	}
 
