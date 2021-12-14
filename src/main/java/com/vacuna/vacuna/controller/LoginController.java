@@ -3,10 +3,12 @@ package com.vacuna.vacuna.controller;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,10 +222,19 @@ public class LoginController {
 	 */
 	public void logout(HttpServletRequest request) throws LogoutException {
 		try {
-			request.getSession().removeAttribute(userEmail);
+				
+			HttpSession session = request.getSession();
+			Enumeration<String> attributes = session.getAttributeNames();
+
+			while (attributes.hasMoreElements()) {
+				String attr = attributes.nextElement();
+				session.removeAttribute(attr);	
+			}
+		
 		} catch (Exception e) {
 			throw new LogoutException();
 		}
+		
 	}
 	
 	
