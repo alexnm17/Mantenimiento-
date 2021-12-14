@@ -33,7 +33,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 				let info = {
 					id: app.cita.id,
-					dniPaciente: app.cita.dniPaciente,
+					dniPaciente: this.dniPaciente(),
 					fechaPrimeraDosis: this.fechaPrimeraDosis(),
 					fechaSegundaDosis: this.fechaSegundaDosis(),
 					centrosSanitarios: app.cita.centroAsignado,

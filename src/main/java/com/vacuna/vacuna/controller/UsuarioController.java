@@ -139,28 +139,6 @@ public class UsuarioController {
 		repository.insert(u);
 
 	} 
-
-	
-	@PutMapping("/actualizarDosis")
-	/***
-	 * Metodo para actualizar las dosis de los pacientes
-	 * @param info
-	 */
-	public void actualizarDosis(@RequestBody Map<String, Object> info){
-		JSONObject jso = new JSONObject(info);
-		String dniPaciente = jso.optString("dniPaciente");
-		String primeraDosis = jso.optString("primeraDosis");
-		String segundaDosis = jso.optString("segundaDosis");
-		Paciente u = (Paciente) repository.findByDni(dniPaciente);
-		if(primeraDosis.equals("1")) {
-			u.setDosisAdministradas("1");
-		}
-		if(segundaDosis.equals("1")) {
-			u.setDosisAdministradas("2");
-		}
-		repository.save(u);
-	}
-
 	
 	@GetMapping("/getNombrePaciente/{dni}")
 	/***
@@ -173,7 +151,6 @@ public class UsuarioController {
 		return u.getNombre();	
 	}
 
-	
 	@GetMapping("/getTodos")
 	/***
 	 * Metodo para buscar los usuarios
@@ -187,7 +164,6 @@ public class UsuarioController {
 			throw new UsuariosNoEncontradosException();
 		}
 	}
-
 
 	@GetMapping("/getCentros")
 	/***
@@ -204,7 +180,6 @@ public class UsuarioController {
 		}
 
 	}
-
 
 	@Transactional
 	@DeleteMapping("/eliminarUsuario/{email}")
@@ -233,7 +208,6 @@ public class UsuarioController {
 		}
 		return repository.deleteByEmail(email);
 	}
-	
 	
 	@PostMapping("/modificarUsuarios")
 	/***
@@ -281,7 +255,6 @@ public class UsuarioController {
 		
 	}
 	
-	
 	@GetMapping("/buscarEmail/{email}")
 	/***
 	 * MEtodo para leer los usuarios
@@ -307,7 +280,6 @@ public class UsuarioController {
 		return u.getTipoUsuario();
 		
 	}
-
 
 	/***
 	 * Metodo que comprueba que los valores de una cadena son validos

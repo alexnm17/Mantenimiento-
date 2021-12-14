@@ -104,34 +104,6 @@ public class CitaController {
 		}
 	}
 
-	@Transactional
-	@DeleteMapping("/eliminarCitaCompleta/{id}")
-	/***
-	 * Eliminamos las dos citas, la de la primera dosis y la de la segunda
-	 * 
-	 * @param id
-	 * @return null
-	 */
-	public Cita eliminar1CitaCompleta(@PathVariable String id) {
-		Optional<Cita> c = repositoryCita.findById(id);
-
-		if (c.isPresent()) {
-			Cita citaAux = new Cita();
-			citaAux = c.get();
-			Paciente p = (Paciente) repositoryUsuario.findByDni(c.get().getDniPaciente());
-			p.setDosisAdministradas("0");
-			repositoryUsuario.save(p);
-			String nombreCentro = citaAux.getNombreCentro();
-			CentroSanitario cs = repositoryCentro.findByNombre(nombreCentro);
-			cs.setDosisTotales(cs.getDosisTotales() + 1);
-			repositoryCentro.save(cs);
-			repositoryCita.deleteById(id);
-
-		}
-
-		return null;
-	}
-
 	@DeleteMapping("/anularCita/{id}")
 	public void anularCita(HttpSession session, @PathVariable String id) {
 		try {

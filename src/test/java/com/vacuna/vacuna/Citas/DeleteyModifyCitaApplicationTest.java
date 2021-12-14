@@ -1,11 +1,16 @@
 package com.vacuna.vacuna.Citas;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -36,6 +41,7 @@ import com.vacuna.vacuna.dao.UsuarioDAO;
 import com.vacuna.vacuna.model.CentroSanitario;
 import com.vacuna.vacuna.model.Cita;
 import com.vacuna.vacuna.model.Paciente;
+
 /***
  * 
  * @author crist
@@ -85,7 +91,7 @@ class DeleteyModifyCitaApplicationTest {
 		String body = json.toString();
 		
 		try {
-			mockMvc.perform(MockMvcRequestBuilders.delete("/cita/anularCita")
+			mockMvc.perform(MockMvcRequestBuilders.delete("/cita/anularCita/d07ff562-00a7-482f-8d88-70c87746871b")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(body))
 					.andExpect(MockMvcResultMatchers.status().isOk());
@@ -109,30 +115,32 @@ class DeleteyModifyCitaApplicationTest {
 				.andExpect(status().is(200));
 	}
 	
-	/***
-	 * Test expected error cambio de fecha pasada
-	 * @throws Exception
-	 */
 	@Test
-	void expectedErrorFechaPasada() throws Exception {
-		JSONObject requestBody = new JSONObject();
-		requestBody.put("dni", p.getDni());
-		requestBody.put("centrosSanitarios", c.getNombreCentro());
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		Date primeraDate = new Date(1640471862+86400);
-		Date segundaDate = new Date(1642286262+86400);
+	void testGetCitasOtroDia() {
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("emailUsuario", "rafa@gmail.com");
+		mapa.put("fecha","2021-12-01");
 		
-		requestBody.put("fechaPrimeraDosis", formatter.format(primeraDate)); //Lo movemos un día adelante
-		requestBody.put("fechaSegundaDosis", formatter.format(segundaDate)); //Lo movemos un día adelante
+		JSONObject json = new JSONObject(mapa);
+		String body = json.toString();
 		
-		final ResultActions resultado = mockMvc.perform(MockMvcRequestBuilders.put("/cita/modificarCita/"+c.getId())
-				.sessionAttr("userEmail", p.getEmail())
-				.content(requestBody.toString())
-				.contentType(org.springframework.http.MediaType.APPLICATION_JSON_UTF8)
-				).andExpect(status().is(409));
-				
+		List<Cita> listaCitasUsuario = new ArrayList<Cita>();
+		listaCitasUsuario.add(c);
+		
+		try {
+			when(citaDAO.findAllByNombreCentroAndFecha(any(), any())).thenReturn(listaCitasUsuario);
+			lenient().when(DAO.findByEmail(any())).thenReturn(p);
+			mockMvc.perform(MockMvcRequestBuilders.post("/getCitasOtroDia")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(body))
+					.andExpect(MockMvcResultMatchers.status().isOk());
+			//si no hay excepciones va bien
+			assertTrue(true);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
-	
 	
 	@AfterEach
 	public void deleteAll() {
