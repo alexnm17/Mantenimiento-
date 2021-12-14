@@ -13,9 +13,6 @@ public class CentroSanitario {
 		private String id;
 		private String nombre;
 		private int dosisTotales;
-		//private int aforo;
-		//private int horaInicio;
-		//private int horaFin;
 		private String localidad;
 		private String provincia;
 		
